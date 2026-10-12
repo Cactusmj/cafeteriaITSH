@@ -1,0 +1,23 @@
+# Dependencias
+node_modules/
+
+# Compilados
+dist/
+build/
+
+# Variables de entorno (nunca versionar los valores reales).
+# Se conservan las plantillas *.example.
+.env
+.env.*
+!.env.example
+!.env.example.*
+
+# Cobertura de pruebas
+coverage/
+
+# Registros
+*.log
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
