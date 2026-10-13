@@ -144,11 +144,11 @@ export async function cambiarEstado(
   activo: boolean,
   solicitanteId: number,
 ): Promise<UsuarioPublico & { activo: boolean }> {
-  await obtenerOperativo(id);
-
   if (!activo && id === solicitanteId) {
     throw errorConflicto('CONFLICTO', 'No puedes deshabilitar tu propia cuenta');
   }
+
+  await obtenerOperativo(id);
 
   await pool.execute('UPDATE usuario SET activo = ? WHERE id = ?', [activo, id]);
   const actualizado = await obtenerOperativo(id);

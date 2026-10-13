@@ -106,6 +106,14 @@ describe('usuarios.service.cambiarEstado', () => {
     await expect(cambiarEstado(1, false, 1)).rejects.toMatchObject({ codigo: 'CONFLICTO' });
   });
 
+  it('responde CONFLICTO al deshabilitar la propia cuenta aunque no sea operativa', async () => {
+    await expect(cambiarEstado(1, false, 1)).rejects.toMatchObject({
+      codigo: 'CONFLICTO',
+      estadoHttp: 409,
+    });
+    expect(ejecutar).not.toHaveBeenCalled();
+  });
+
   it('deshabilita una cuenta distinta', async () => {
     ejecutar
       .mockResolvedValueOnce([
