@@ -47,7 +47,7 @@ npm run dev        # en frontend/ (app en http://localhost:5173)
 
 ## Escenario 3 — Consulta del cliente (US3)
 
-1. Abrir `/menu` sin sesión (o con sesión de cliente) → ve el menú de hoy con
+1. Iniciar sesión como cliente (o cualquier rol) y abrir `/menu` → ve el menú de hoy con
    nombre, precio y categorías.
 2. Verificar que el platillo marcado especial aparece identificado como
    especial.

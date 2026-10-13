@@ -62,7 +62,7 @@ un platillo no disponible aparece identificado como tal.
 1. **Given** un menú publicado para la fecha actual, **When** el cliente abre la consulta del menú, **Then** ve los platillos con nombre, precio, disponibilidad y marca de especial.
 2. **Given** un platillo marcado como no disponible, **When** el cliente consulta el menú, **Then** el platillo aparece marcado como no disponible.
 3. **Given** cambios recientes del administrador (precio, disponibilidad o especiales), **When** el cliente vuelve a consultar el menú, **Then** ve los valores actualizados sin esperas perceptibles.
-4. **Given** sin sesión de cliente, **When** un visitante abre la consulta del menú, **Then** el menú es consultable (la compra todavía no existe en este sprint).
+4. **Given** una sesión activa de cliente, **When** el alumno o docente abre `/menu`, **Then** ve el menú del día; la API de consulta es pública (sin sesión) para futuras integraciones.
 
 ---
 
@@ -119,6 +119,6 @@ un platillo no disponible aparece identificado como tal.
 - Las categorías son un catálogo simple administrable dentro de la gestión de platillos (lista fija en este sprint: comidas, bebidas, postres, complementos), sin entidad independiente de administración.
 - Un platillo se desactiva con baja lógica; su historial en menús de días pasados se conserva.
 - Los precios se registran como importe en pesos con dos decimales como máximo.
-- La consulta del menú es pública (sin sesión) porque la compra aún no existe; la autenticación de clientes ya está disponible desde el sprint 1.
+- La API de consulta del menú es pública (sin sesión), pero la pantalla `/menu` vive en el área de clientes tras iniciar sesión (constitución, Principio I); la autenticación de clientes ya existe desde el sprint 1.
 - No entran pedidos, carrito, pagos ni notificaciones; este sprint prepara el menú que el sprint 3 usará para pedir.
 - El diseño sigue `.stitch/DESIGN.md` como referencia y los tokens ya existentes de Tailwind; se prioriza legibilidad y áreas táctiles ≥ 44 px en operaciones frecuentes.
