@@ -1,10 +1,10 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { usarSesion } from '../lib/ContextoSesion'
+import { useSesion } from '../lib/useSesion'
 import { INICIO_POR_ROL, type Rol } from '../lib/sesion'
 
 /** Permite el acceso solo a los roles indicados; si no, redirige a su inicio. */
 export function RutaPorRol({ roles }: { roles: Rol[] }) {
-  const { usuario } = usarSesion()
+  const { usuario } = useSesion()
   if (!usuario) {
     return <Navigate to="/login" replace />
   }

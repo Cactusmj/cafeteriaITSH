@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ErrorPeticion } from '../../lib/api'
-import { usarSesion } from '../../lib/ContextoSesion'
+import { useSesion } from '../../lib/useSesion'
 import { INICIO_POR_ROL } from '../../lib/sesion'
 
 const claseCampo =
@@ -11,7 +11,7 @@ const claseBoton =
 
 /** Pantalla de inicio de sesión. */
 export function Login() {
-  const { iniciarSesion } = usarSesion()
+  const { iniciarSesion } = useSesion()
   const navegar = useNavigate()
   const [correo, setCorreo] = useState('')
   const [password, setPassword] = useState('')

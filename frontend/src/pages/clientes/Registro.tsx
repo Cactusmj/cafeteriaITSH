@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ErrorPeticion } from '../../lib/api'
-import { usarSesion } from '../../lib/ContextoSesion'
+import { useSesion } from '../../lib/useSesion'
 import { INICIO_POR_ROL } from '../../lib/sesion'
 
 const claseCampo =
@@ -11,7 +11,7 @@ const claseBoton =
 
 /** Pantalla de registro de clientes. */
 export function Registro() {
-  const { registrar } = usarSesion()
+  const { registrar } = useSesion()
   const navegar = useNavigate()
   const [nombre, setNombre] = useState('')
   const [correo, setCorreo] = useState('')

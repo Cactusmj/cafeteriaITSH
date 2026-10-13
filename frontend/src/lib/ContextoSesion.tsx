@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { api } from './api'
+import { ContextoSesion, type ValorSesion } from './useSesion'
 import {
   guardarSesion,
   leerSesion,
@@ -11,16 +12,6 @@ interface RespuestaSesion {
   token: string
   usuario: UsuarioSesion
 }
-
-export interface ValorSesion {
-  usuario: UsuarioSesion | null
-  token: string | null
-  iniciarSesion: (correo: string, password: string) => Promise<UsuarioSesion>
-  registrar: (datos: { nombre: string; correo: string; password: string }) => Promise<UsuarioSesion>
-  cerrarSesion: () => void
-}
-
-const ContextoSesion = createContext<ValorSesion | null>(null)
 
 export function ProveedorSesion({ children }: { children: ReactNode }) {
   const inicial = leerSesion()
@@ -59,13 +50,4 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
   }
 
   return <ContextoSesion.Provider value={valor}>{children}</ContextoSesion.Provider>
-}
-
-/** Accede al contexto de sesión; falla si se usa fuera del proveedor. */
-export function usarSesion(): ValorSesion {
-  const contexto = useContext(ContextoSesion)
-  if (!contexto) {
-    throw new Error('usarSesion debe usarse dentro de ProveedorSesion')
-  }
-  return contexto
 }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { api, ErrorPeticion } from '../../lib/api'
-import { usarSesion } from '../../lib/ContextoSesion'
+import { useSesion } from '../../lib/useSesion'
 
 type RolOperativo = 'cajero' | 'cocinero'
 
@@ -21,7 +21,7 @@ const claseBotonSecundario =
 
 /** Panel del administrador para gestionar cuentas operativas. */
 export function Usuarios() {
-  const { token } = usarSesion()
+  const { token } = useSesion()
   const [usuarios, setUsuarios] = useState<UsuarioOperativo[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -33,10 +33,9 @@ export function Usuarios() {
   const [creando, setCreando] = useState(false)
 
   const cargar = useCallback(async () => {
-    setCargando(true)
-    setError(null)
     try {
       const datos = await api<{ usuarios: UsuarioOperativo[] }>('/api/admin/usuarios', { token })
+      setError(null)
       setUsuarios(datos.usuarios)
     } catch (err) {
       setError(err instanceof ErrorPeticion ? err.mensaje : 'No se pudo cargar la lista')
@@ -45,8 +44,13 @@ export function Usuarios() {
     }
   }, [token])
 
+  const refrescar = useCallback(() => {
+    setCargando(true)
+    return cargar()
+  }, [cargar])
+
   useEffect(() => {
-    void cargar()
+    void Promise.resolve().then(cargar)
   }, [cargar])
 
   async function crear(evento: FormEvent) {
@@ -63,7 +67,7 @@ export function Usuarios() {
       setCorreo('')
       setPassword('')
       setRol('cajero')
-      await cargar()
+      await refrescar()
     } catch (err) {
       setError(err instanceof ErrorPeticion ? err.mensaje : 'No se pudo crear el usuario')
     } finally {
@@ -79,7 +83,7 @@ export function Usuarios() {
         token,
         cuerpo: { activo: !usuario.activo },
       })
-      await cargar()
+      await refrescar()
     } catch (err) {
       setError(err instanceof ErrorPeticion ? err.mensaje : 'No se pudo actualizar el estado')
     }
@@ -93,7 +97,7 @@ export function Usuarios() {
         token,
         cuerpo: { rol: nuevoRol },
       })
-      await cargar()
+      await refrescar()
     } catch (err) {
       setError(err instanceof ErrorPeticion ? err.mensaje : 'No se pudo actualizar el rol')
     }

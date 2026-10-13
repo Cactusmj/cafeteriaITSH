@@ -1,8 +1,10 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { LayoutPorRol } from '../components/layout/LayoutPorRol'
-import { usarSesion } from '../lib/ContextoSesion'
+import { useSesion } from '../lib/useSesion'
 import { INICIO_POR_ROL } from '../lib/sesion'
 import { Usuarios } from '../pages/admin/Usuarios'
+import { Platillos } from '../pages/admin/Platillos'
+import { MenuDelDia } from '../pages/admin/MenuDelDia'
 import { Caja } from '../pages/caja/Caja'
 import { Login } from '../pages/clientes/Login'
 import { Menu } from '../pages/clientes/Menu'
@@ -14,7 +16,7 @@ import { RutaProtegida } from './RutaProtegida'
 
 /** Redirige a la ruta inicial según la sesión. */
 function Inicio() {
-  const { usuario } = usarSesion()
+  const { usuario } = useSesion()
   if (!usuario) {
     return <Navigate to="/login" replace />
   }
@@ -35,6 +37,8 @@ export function AppRouter() {
 
           <Route element={<RutaPorRol roles={['administrador']} />}>
             <Route path="/admin/usuarios" element={<Usuarios />} />
+            <Route path="/admin/platillos" element={<Platillos />} />
+            <Route path="/admin/menu" element={<MenuDelDia />} />
           </Route>
           <Route element={<RutaPorRol roles={['cajero']} />}>
             <Route path="/caja" element={<Caja />} />

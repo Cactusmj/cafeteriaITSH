@@ -1,5 +1,5 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom'
-import { usarSesion } from '../../lib/ContextoSesion'
+import { useSesion } from '../../lib/useSesion'
 import { INICIO_POR_ROL, type Rol } from '../../lib/sesion'
 
 interface Enlace {
@@ -8,7 +8,11 @@ interface Enlace {
 }
 
 const NAVEGACION: Record<Rol, Enlace[]> = {
-  administrador: [{ etiqueta: 'Usuarios', ruta: '/admin/usuarios' }],
+  administrador: [
+    { etiqueta: 'Usuarios', ruta: '/admin/usuarios' },
+    { etiqueta: 'Platillos', ruta: '/admin/platillos' },
+    { etiqueta: 'Menú del día', ruta: '/admin/menu' },
+  ],
   cajero: [{ etiqueta: 'Caja', ruta: '/caja' }],
   cocinero: [{ etiqueta: 'Cocina', ruta: '/cocina' }],
   usuario: [
@@ -22,7 +26,7 @@ const claseEnlace =
 
 /** Estructura común con encabezado, navegación por rol y contenido. */
 export function LayoutPorRol() {
-  const { usuario, cerrarSesion } = usarSesion()
+  const { usuario, cerrarSesion } = useSesion()
   const navegar = useNavigate()
 
   if (!usuario) {
