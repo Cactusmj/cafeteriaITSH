@@ -130,8 +130,8 @@ implementación y prueba independientes.
 
 - [x] T040 [P] Crear `.gitignore` raíz (`node_modules/`, `dist/`, `.env*`, `coverage/`) y confirmar que `backend/.env` no se versiona
 - [x] T041 [P] Pruebas de permisos por rol (401 sin token, 403 con rol incorrecto) en `backend/tests/permisos.test.ts`
-- [ ] T042 Verificar que `npm test` y `npm run typecheck` pasan en `backend/` y `frontend/`, y comprobar la responsividad en móvil y escritorio con áreas táctiles ≥ 44 px en `/caja` y `/cocina`
-- [ ] T043 Ejecutar la validación de `specs/002-foundation-auth/quickstart.md` (incluye la comprobación de responsividad)
+- [x] T042 Verificar que `npm test` y `npm run typecheck` pasan en `backend/` y `frontend/`, y comprobar la responsividad en móvil y escritorio con áreas táctiles ≥ 44 px en `/caja` y `/cocina`
+- [x] T043 Ejecutar la validación de `specs/002-foundation-auth/quickstart.md` (incluye la comprobación de responsividad)
 
 ---
 

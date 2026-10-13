@@ -20,9 +20,9 @@ sprint es un subconjunto trazable de ella (historias, FRs y criterios).
 
 ## Vista general
 
-| Sprint | Semanas (est.) | Feature speckit | Historias de 001 | Demo del sprint |
-|---|---|---|---|---|
-| 1 | 1–2 (2026-10-13 → 10-26) | `specs/002-foundation-auth/` | US6 + infraestructura | Login por rol y rutas protegidas |
+| Sprint | Semanas (est.) | Feature speckit | Historias de 001 | Demo del sprint | Estado |
+|---|---|---|---|---|---|
+| 1 | 1–2 (2026-10-13 → 10-26) | `specs/002-foundation-auth/` | US6 + infraestructura | Login por rol y rutas protegidas | Completado (2026-10-13) |
 | 2 | 3–4 (2026-10-27 → 11-09) | `specs/003-menu-management/` | US7 + US1 | Admin publica el menú; alumno lo consulta en el móvil |
 | 3 | 5–6 (2026-11-10 → 11-23) | `specs/004-advance-orders-payment/` | US2 | Flujo alumno: menú → pedido → pago anticipado |
 | 4 | 7–8 (2026-11-24 → 12-07) | `specs/005-counter-kitchen/` | US3 + US4 | Cajero captura mostrador; cocina procesa en pantalla |
@@ -59,6 +59,10 @@ esqueleto del frontend (app única con rutas por rol).
 - Acceder a una ruta sin sesión redirige a `/login`; con otro rol, se deniega.
 - Las contraseñas nunca viajan ni se almacenan en texto plano.
 - `npm test` y `npm run typecheck` en verde (backend y frontend).
+
+**Estado**: completado — validación del `quickstart.md` ejecutada (25/25
+escenarios de API en verde) y demo aprobada por la patrocinadora el
+2026-10-13.
 
 ---
 
