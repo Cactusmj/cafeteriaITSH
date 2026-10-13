@@ -22,13 +22,18 @@ sprint es un subconjunto trazable de ella (historias, FRs y criterios).
 
 | Sprint | Semanas (est.) | Feature speckit | Historias de 001 | Demo del sprint | Estado |
 |---|---|---|---|---|---|
-| 1 | 1–2 (2026-10-13 → 10-26) | `specs/002-foundation-auth/` | US6 + infraestructura | Login por rol y rutas protegidas | Completado (2026-10-13) |
-| 2 | 3–4 (2026-10-27 → 11-09) | `specs/003-menu-management/` | US7 + US1 | Admin publica el menú; alumno lo consulta en el móvil |
-| 3 | 5–6 (2026-11-10 → 11-23) | `specs/004-advance-orders-payment/` | US2 | Flujo alumno: menú → pedido → pago anticipado |
-| 4 | 7–8 (2026-11-24 → 12-07) | `specs/005-counter-kitchen/` | US3 + US4 | Cajero captura mostrador; cocina procesa en pantalla |
-| 5 | 9–10 (2026-12-08 → 12-21) | `specs/006-order-tracking-notifications/` | US5 + pulido | Notificación de pedido listo + demo completa |
+| 1 | 1–2 (2026-10-13 → 10-26) | `specs/002-foundation-auth/` | US1 + US8 | Login por rol y rutas protegidas | Completado (2026-10-13) |
+| 2 | 3–4 (2026-10-27 → 11-09) | `specs/003-menu-management/` | US2 + US3 | Admin publica el menú; alumno lo consulta en el móvil | |
+| 3 | 5–6 (2026-11-10 → 11-23) | `specs/004-advance-orders-payment/` | US4 | Flujo alumno: menú → pedido → pago anticipado | |
+| 4 | 7–8 (2026-11-24 → 12-07) | `specs/005-counter-kitchen/` | US5 + US6 | Cajero captura mostrador; cocina procesa en pantalla | |
+| 5 | 9–10 (2026-12-08 → 12-21) | `specs/006-order-tracking-notifications/` | US7 + pulido | Notificación de pedido listo + demo completa | |
 
 > Las fechas son estimadas; se ajustan al calendario real del plantel.
+>
+> La columna "Historias de 001" usa la numeración de la spec maestra
+> `specs/001-pedidos-anticipados-cafeteria/spec.md` (referencia autoritativa).
+> Una versión anterior de esta tabla usaba otra numeración heredada; las specs
+> de sprint 002 y posteriores documentan el mapeo.
 
 ---
 
