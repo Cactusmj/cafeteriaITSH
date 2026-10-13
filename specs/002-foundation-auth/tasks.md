@@ -1,4 +1,4 @@
----
+﻿---
 
 description: "Task list for Sprint 1 — Fundamentos y autenticación"
 ---
@@ -37,13 +37,13 @@ implementación y prueba independientes.
 
 **Purpose**: Inicialización de la estructura y herramientas del proyecto
 
-- [ ] T001 Crear estructura de carpetas del backend en `backend/src/{config,routes,controllers,services,middlewares,schemas,utils}` y `backend/tests`
-- [ ] T002 [P] Configurar `backend/package.json` con scripts `dev`, `build`, `start`, `test`, `typecheck`, `seed:usuarios` (`node scripts/sembrar-usuarios.mjs`) y dependencias (`express`, `jsonwebtoken`, `bcrypt`, `mysql2`, `dotenv`, `zod`) más dev (`typescript`, `vitest`, `tsx`, `@types/express`, `@types/node`, `@types/jsonwebtoken`, `@types/bcrypt`)
-- [ ] T003 [P] Configurar TypeScript estricto en `backend/tsconfig.json` (`strict: true`, `noUncheckedIndexedAccess`)
-- [ ] T004 [P] Configurar Vitest en `backend/vitest.config.ts`
-- [ ] T005 [P] Añadir al frontend Tailwind CSS y dependencias (`react-router-dom`, `tailwindcss`, `vitest`, `@testing-library/react`, `jsdom`) en `frontend/package.json`, y crear `frontend/.env.example` con `VITE_API_URL`
-- [ ] T006 [P] Configurar Vitest + Testing Library y el script `typecheck` en `frontend/vite.config.ts` y `frontend/package.json`
-- [ ] T007 [P] Crear estructura de carpetas del frontend: `frontend/src/{pages/{admin,caja,cocina,clientes},components/{ui,layout},routes,lib}`
+- [x] T001 Crear estructura de carpetas del backend en `backend/src/{config,routes,controllers,services,middlewares,schemas,utils}` y `backend/tests`
+- [x] T002 [P] Configurar `backend/package.json` con scripts `dev`, `build`, `start`, `test`, `typecheck`, `seed:usuarios` (`node scripts/sembrar-usuarios.mjs`) y dependencias (`express`, `jsonwebtoken`, `bcrypt`, `mysql2`, `dotenv`, `zod`) más dev (`typescript`, `vitest`, `tsx`, `@types/express`, `@types/node`, `@types/jsonwebtoken`, `@types/bcrypt`)
+- [x] T003 [P] Configurar TypeScript estricto en `backend/tsconfig.json` (`strict: true`, `noUncheckedIndexedAccess`)
+- [x] T004 [P] Configurar Vitest en `backend/vitest.config.ts`
+- [x] T005 [P] Añadir al frontend Tailwind CSS y dependencias (`react-router-dom`, `tailwindcss`, `vitest`, `@testing-library/react`, `jsdom`) en `frontend/package.json`, y crear `frontend/.env.example` con `VITE_API_URL`
+- [x] T006 [P] Configurar Vitest + Testing Library y el script `typecheck` en `frontend/vite.config.ts` y `frontend/package.json`
+- [x] T007 [P] Crear estructura de carpetas del frontend: `frontend/src/{pages/{admin,caja,cocina,clientes},components/{ui,layout},routes,lib}`
 
 ---
 
@@ -53,21 +53,21 @@ implementación y prueba independientes.
 
 **⚠️ CRITICAL**: Ninguna historia puede empezar hasta terminar esta fase
 
-- [ ] T008 Cargar variables de entorno en `backend/src/config/env.ts` y crear `backend/.env.example` con `DATABASE_URL` (o `DB_HOST/DB_USER/DB_PASSWORD/DB_NAME`), `JWT_SECRET`, `SEED_PASSWORD`, `NODE_ENV`, `PORT`
-- [ ] T009 Crear el pool de conexión MySQL en `backend/src/config/db.ts` usando `mysql2/promise`
-- [ ] T010 [P] Crear utilerías de errores en `backend/src/utils/errores.ts` (clase `ErrorAplicacion` con código HTTP y `codigo`, más manejador de errores)
-- [ ] T011 [P] Crear utilería de hash en `backend/src/utils/hash.ts` (bcrypt: `hashear`, `verificar`)
-- [ ] T012 [P] Crear utilería JWT en `backend/src/utils/jwt.ts` (`firmar`, `verificar` con HS256)
-- [ ] T013 Crear middleware `autenticar` en `backend/src/middlewares/autenticar.ts` (valida `Authorization: Bearer`, adjunta `req.usuario`)
-- [ ] T014 Crear middleware `autorizarRol` en `backend/src/middlewares/autorizarRol.ts` (recibe roles permitidos; responde 403)
-- [ ] T015 Crear la app Express en `backend/src/app.ts` y el arranque en `backend/src/server.ts` (montaje de rutas base, manejador de errores, 404)
-- [ ] T016 [P] Crear el cliente HTTP en `frontend/src/lib/api.ts` (usa `VITE_API_URL`, adjunta el token y centraliza errores)
-- [ ] T017 [P] Crear la gestión de sesión en `frontend/src/lib/sesion.ts` (guardar/leer/limpiar token y usuario en `localStorage`)
-- [ ] T018 Crear `frontend/src/lib/ContextoSesion.tsx` (proveedor y hook de sesión)
-- [ ] T019 Crear `RutaProtegida` y `RutaPorRol` en `frontend/src/routes/RutaProtegida.tsx` y `frontend/src/routes/RutaPorRol.tsx`
-- [ ] T020 Crear el router base en `frontend/src/routes/AppRouter.tsx` con las rutas `/login`, `/admin`, `/caja`, `/cocina`, `/menu`, `/mis-pedidos` y `frontend/src/components/layout/LayoutPorRol.tsx`
-- [ ] T021 [P] Crear `backend/scripts/sembrar-usuarios.mjs` (lee `SEED_PASSWORD` del entorno, hashea con bcrypt, idempotente por correo) y `docs/seeds.md`; ejecutar `npm run seed:usuarios` y verificar que el administrador puede iniciar sesión
-- [ ] T022 [P] Crear utilería de logging en `backend/src/utils/logger.ts` (registra errores sin datos sensibles: nunca contraseñas ni tokens)
+- [x] T008 Cargar variables de entorno en `backend/src/config/env.ts` y crear `backend/.env.example` con `DATABASE_URL` (o `DB_HOST/DB_USER/DB_PASSWORD/DB_NAME`), `JWT_SECRET`, `SEED_PASSWORD`, `NODE_ENV`, `PORT`
+- [x] T009 Crear el pool de conexión MySQL en `backend/src/config/db.ts` usando `mysql2/promise`
+- [x] T010 [P] Crear utilerías de errores en `backend/src/utils/errores.ts` (clase `ErrorAplicacion` con código HTTP y `codigo`, más manejador de errores)
+- [x] T011 [P] Crear utilería de hash en `backend/src/utils/hash.ts` (bcrypt: `hashear`, `verificar`)
+- [x] T012 [P] Crear utilería JWT en `backend/src/utils/jwt.ts` (`firmar`, `verificar` con HS256)
+- [x] T013 Crear middleware `autenticar` en `backend/src/middlewares/autenticar.ts` (valida `Authorization: Bearer`, adjunta `req.usuario`)
+- [x] T014 Crear middleware `autorizarRol` en `backend/src/middlewares/autorizarRol.ts` (recibe roles permitidos; responde 403)
+- [x] T015 Crear la app Express en `backend/src/app.ts` y el arranque en `backend/src/server.ts` (montaje de rutas base, manejador de errores, 404)
+- [x] T016 [P] Crear el cliente HTTP en `frontend/src/lib/api.ts` (usa `VITE_API_URL`, adjunta el token y centraliza errores)
+- [x] T017 [P] Crear la gestión de sesión en `frontend/src/lib/sesion.ts` (guardar/leer/limpiar token y usuario en `localStorage`)
+- [x] T018 Crear `frontend/src/lib/ContextoSesion.tsx` (proveedor y hook de sesión)
+- [x] T019 Crear `RutaProtegida` y `RutaPorRol` en `frontend/src/routes/RutaProtegida.tsx` y `frontend/src/routes/RutaPorRol.tsx`
+- [x] T020 Crear el router base en `frontend/src/routes/AppRouter.tsx` con las rutas `/login`, `/admin`, `/caja`, `/cocina`, `/menu`, `/mis-pedidos` y `frontend/src/components/layout/LayoutPorRol.tsx`
+- [x] T021 [P] Crear `backend/scripts/sembrar-usuarios.mjs` (lee `SEED_PASSWORD` del entorno, hashea con bcrypt, idempotente por correo) y `docs/seeds.md`; ejecutar `npm run seed:usuarios` y verificar que el administrador puede iniciar sesión
+- [x] T022 [P] Crear utilería de logging en `backend/src/utils/logger.ts` (registra errores sin datos sensibles: nunca contraseñas ni tokens)
 
 **Checkpoint**: Fundación lista — las historias pueden comenzar
 
@@ -83,19 +83,19 @@ implementación y prueba independientes.
 
 > Escribir primero y confirmar que fallan antes de implementar
 
-- [ ] T023 [P] [US1] Test unitario de `backend/src/utils/jwt.ts` en `backend/tests/jwt.test.ts` (firmar/verificar, token expirado, firma inválida)
-- [ ] T024 [P] [US1] Test unitario de autenticación en `backend/tests/auth.service.test.ts` (registro, login correcto, credenciales inválidas, cuenta inactiva, contraseña < 8 rechazada)
-- [ ] T025 [P] [US1] Test de guardas de ruta en `frontend/src/routes/rutas.test.tsx` (sin sesión → `/login`; rol cruzado → denegado)
+- [x] T023 [P] [US1] Test unitario de `backend/src/utils/jwt.ts` en `backend/tests/jwt.test.ts` (firmar/verificar, token expirado, firma inválida)
+- [x] T024 [P] [US1] Test unitario de autenticación en `backend/tests/auth.service.test.ts` (registro, login correcto, credenciales inválidas, cuenta inactiva, contraseña < 8 rechazada)
+- [x] T025 [P] [US1] Test de guardas de ruta en `frontend/src/routes/rutas.test.tsx` (sin sesión → `/login`; rol cruzado → denegado)
 
 ### Implementation for User Story 1
 
-- [ ] T026 [US1] Definir esquemas zod de `registro` y `login` en `backend/src/schemas/auth.schemas.ts` (contraseña mínima de 8 caracteres)
-- [ ] T027 [US1] Implementar `backend/src/services/auth.service.ts` (registrar cliente con rol `usuario`, iniciar sesión verificando bcrypt y `activo`, obtener usuario por id)
-- [ ] T028 [US1] Implementar `backend/src/controllers/auth.controller.ts`
-- [ ] T029 [US1] Implementar `backend/src/routes/auth.routes.ts` (`POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`) y montarlas en `backend/src/app.ts` (edita `app.ts`; debe ir antes/después de T038, nunca en paralelo)
-- [ ] T030 [US1] Implementar la página de login en `frontend/src/pages/clientes/Login.tsx`
-- [ ] T031 [US1] Implementar la página de registro en `frontend/src/pages/clientes/Registro.tsx`
-- [ ] T032 [US1] Conectar login/registro con `frontend/src/lib/api.ts` y `ContextoSesion`, y redirigir por rol en `frontend/src/routes/AppRouter.tsx`
+- [x] T026 [US1] Definir esquemas zod de `registro` y `login` en `backend/src/schemas/auth.schemas.ts` (contraseña mínima de 8 caracteres)
+- [x] T027 [US1] Implementar `backend/src/services/auth.service.ts` (registrar cliente con rol `usuario`, iniciar sesión verificando bcrypt y `activo`, obtener usuario por id)
+- [x] T028 [US1] Implementar `backend/src/controllers/auth.controller.ts`
+- [x] T029 [US1] Implementar `backend/src/routes/auth.routes.ts` (`POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`) y montarlas en `backend/src/app.ts` (edita `app.ts`; debe ir antes/después de T038, nunca en paralelo)
+- [x] T030 [US1] Implementar la página de login en `frontend/src/pages/clientes/Login.tsx`
+- [x] T031 [US1] Implementar la página de registro en `frontend/src/pages/clientes/Registro.tsx`
+- [x] T032 [US1] Conectar login/registro con `frontend/src/lib/api.ts` y `ContextoSesion`, y redirigir por rol en `frontend/src/routes/AppRouter.tsx`
 
 **Checkpoint**: US1 funcional y probable de forma independiente
 
@@ -109,16 +109,16 @@ implementación y prueba independientes.
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T033 [P] [US2] Test unitario del servicio de usuarios en `backend/tests/usuarios.service.test.ts` (crear solo `cajero`/`cocinero`, correo duplicado, editar, cambiar estado, no deshabilitar la propia cuenta)
-- [ ] T034 [P] [US2] Test del middleware de autorización en `backend/tests/autorizarRol.test.ts` (permite rol correcto, responde 403 con otro rol, 401 sin sesión)
+- [x] T033 [P] [US2] Test unitario del servicio de usuarios en `backend/tests/usuarios.service.test.ts` (crear solo `cajero`/`cocinero`, correo duplicado, editar, cambiar estado, no deshabilitar la propia cuenta)
+- [x] T034 [P] [US2] Test del middleware de autorización en `backend/tests/autorizarRol.test.ts` (permite rol correcto, responde 403 con otro rol, 401 sin sesión)
 
 ### Implementation for User Story 2
 
-- [ ] T035 [US2] Definir esquemas zod de usuarios en `backend/src/schemas/usuarios.schemas.ts` (rol restringido a `cajero|cocinero`; contraseña mínima de 8 caracteres)
-- [ ] T036 [US2] Implementar `backend/src/services/usuarios.service.ts` (listar con filtro por rol, crear, editar, cambiar `activo`)
-- [ ] T037 [US2] Implementar `backend/src/controllers/usuarios.controller.ts`
-- [ ] T038 [US2] Implementar `backend/src/routes/usuarios.routes.ts` con `autenticar` + `autorizarRol('administrador')` y montarlas en `backend/src/app.ts` (edita `app.ts`; secuencial respecto a T029)
-- [ ] T039 [US2] Implementar la página de gestión de usuarios en `frontend/src/pages/admin/Usuarios.tsx` (listar, alta, edición, habilitar/deshabilitar, mensajes de conflicto)
+- [x] T035 [US2] Definir esquemas zod de usuarios en `backend/src/schemas/usuarios.schemas.ts` (rol restringido a `cajero|cocinero`; contraseña mínima de 8 caracteres)
+- [x] T036 [US2] Implementar `backend/src/services/usuarios.service.ts` (listar con filtro por rol, crear, editar, cambiar `activo`)
+- [x] T037 [US2] Implementar `backend/src/controllers/usuarios.controller.ts`
+- [x] T038 [US2] Implementar `backend/src/routes/usuarios.routes.ts` con `autenticar` + `autorizarRol('administrador')` y montarlas en `backend/src/app.ts` (edita `app.ts`; secuencial respecto a T029)
+- [x] T039 [US2] Implementar la página de gestión de usuarios en `frontend/src/pages/admin/Usuarios.tsx` (listar, alta, edición, habilitar/deshabilitar, mensajes de conflicto)
 
 **Checkpoint**: US1 y US2 funcionan de forma independiente
 
@@ -128,8 +128,8 @@ implementación y prueba independientes.
 
 **Purpose**: Mejoras que afectan a ambas historias
 
-- [ ] T040 [P] Crear `.gitignore` raíz (`node_modules/`, `dist/`, `.env*`, `coverage/`) y confirmar que `backend/.env` no se versiona
-- [ ] T041 [P] Pruebas de permisos por rol (401 sin token, 403 con rol incorrecto) en `backend/tests/permisos.test.ts`
+- [x] T040 [P] Crear `.gitignore` raíz (`node_modules/`, `dist/`, `.env*`, `coverage/`) y confirmar que `backend/.env` no se versiona
+- [x] T041 [P] Pruebas de permisos por rol (401 sin token, 403 con rol incorrecto) en `backend/tests/permisos.test.ts`
 - [ ] T042 Verificar que `npm test` y `npm run typecheck` pasan en `backend/` y `frontend/`, y comprobar la responsividad en móvil y escritorio con áreas táctiles ≥ 44 px en `/caja` y `/cocina`
 - [ ] T043 Ejecutar la validación de `specs/002-foundation-auth/quickstart.md` (incluye la comprobación de responsividad)
 
