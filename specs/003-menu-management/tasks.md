@@ -39,7 +39,7 @@ implementación y prueba independientes.
 **Purpose**: Constantes compartidas del dominio del menú. La infraestructura
 general (Express, middlewares, cliente HTTP, sesión) ya existe del sprint 1.
 
-- [ ] T001 [P] Crear la lista fija de categorías en `backend/src/config/categorias.ts` (`comidas`, `bebidas`, `postres`, `complementos` como array de lectura y tipo `Categoria`)
+- [x] T001 [P] Crear la lista fija de categorías en `backend/src/config/categorias.ts` (`comidas`, `bebidas`, `postres`, `complementos` como array de lectura y tipo `Categoria`)
 
 ---
 
@@ -49,7 +49,7 @@ general (Express, middlewares, cliente HTTP, sesión) ya existe del sprint 1.
 
 **⚠️ CRITICAL**: Ninguna historia puede empezar hasta terminar esta fase
 
-- [ ] T002 [P] Crear utilería de fecha en `backend/src/utils/fecha.ts` (`hoyISO()` devuelve `YYYY-MM-DD` con la fecha del servidor; `esFechaISO()` valida el formato; FR-008)
+- [x] T002 [P] Crear utilería de fecha en `backend/src/utils/fecha.ts` (`hoyISO()` devuelve `YYYY-MM-DD` con la fecha del servidor; `esFechaISO()` valida el formato; FR-008)
 
 **Checkpoint**: Fundación lista — las historias pueden comenzar
 
@@ -68,22 +68,22 @@ precios inválidos y permisos.
 
 > Escribir primero y confirmar que fallan antes de implementar
 
-- [ ] T003 [P] [US1] Test unitario de `backend/src/services/platillos.service.ts` en `backend/tests/platillos.service.test.ts` (crear OK; `NOMBRE_EN_USO` con nombre activo duplicado; nombre vacío/ > 100 rechazado; categoría fuera de la lista fija rechazada; descripción > 500 rechazada; editar; `NO_ENCONTRADO` al editar inexistente; desactivar y activar)
-- [ ] T004 [P] [US1] Test unitario de `backend/src/services/menu.service.ts` en `backend/tests/menu.service.test.ts` (agregar platillo al menú OK; precio ≤ 0 o no numérico rechazado; `DUPLICADO` el mismo día; `PLATILLO_INACTIVO`; `NO_ENCONTRADO` con platillo o entrada inexistente; editar precio/disponible/especial; eliminar OK; eliminar con pedidos referenciados → `REFERENCIADO`)
+- [x] T003 [P] [US1] Test unitario de `backend/src/services/platillos.service.ts` en `backend/tests/platillos.service.test.ts` (crear OK; `NOMBRE_EN_USO` con nombre activo duplicado; nombre vacío/ > 100 rechazado; categoría fuera de la lista fija rechazada; descripción > 500 rechazada; editar; `NO_ENCONTRADO` al editar inexistente; desactivar y activar)
+- [x] T004 [P] [US1] Test unitario de `backend/src/services/menu.service.ts` en `backend/tests/menu.service.test.ts` (agregar platillo al menú OK; precio ≤ 0 o no numérico rechazado; `DUPLICADO` el mismo día; `PLATILLO_INACTIVO`; `NO_ENCONTRADO` con platillo o entrada inexistente; editar precio/disponible/especial; eliminar OK; eliminar con pedidos referenciados → `REFERENCIADO`)
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Definir esquemas zod de platillos en `backend/src/schemas/platillos.schemas.ts` (nombre de 1 a 100 caracteres no vacío; `categoria` en la lista fija de T001; `descripcion` opcional de hasta 500)
-- [ ] T006 [US1] Definir esquemas zod del menú en `backend/src/schemas/menu.schemas.ts` (fecha opcional `YYYY-MM-DD` vía `esFechaISO`; `platillo_id` entero positivo; precio numérico > 0 con hasta 2 decimales; `disponible` y `especial` booleanos; FR-008, FR-010)
-- [ ] T007 [US1] Implementar `backend/src/services/platillos.service.ts` (listar activos con `?incluirInactivos`, crear con rechazo de nombre duplicado activo, editar, cambiar `activo`; baja lógica sin borrado físico; FR-001, FR-008, FR-012)
-- [ ] T008 [US1] Implementar `backend/src/services/menu.service.ts` (listar por fecha; agregar platillo al menú validando existencia, `activo` y no duplicado en la fecha; editar `precio`/`disponible`/`especial`; eliminar entrada; si `pedido_detalle` la referencia, `REFERENCIADO`; FR-002, FR-003, FR-009, FR-010; research R7)
-- [ ] T009 [US1] Implementar `backend/src/controllers/platillos.controller.ts`
-- [ ] T010 [US1] Implementar `backend/src/controllers/menu.controller.ts` (gestión)
-- [ ] T011 [US1] Implementar `backend/src/routes/platillos.routes.ts` con `autenticar` + `autorizarRol('administrador')` (contrato `contracts/platillos-api.md`)
-- [ ] T012 [US1] Implementar `backend/src/routes/menu.routes.ts` (prefijo `/api/admin/menu`, solo gestión) y montar `platillos.routes` y `menu.routes` en `backend/src/app.ts` (edita `app.ts`; secuencial respecto a T017)
-- [ ] T013 [US1] Implementar la página de catálogo en `frontend/src/pages/admin/Platillos.tsx` (listar, alta, edición, activar/desactivar, selector de categorías, mensajes de conflicto)
-- [ ] T014 [US1] Implementar la página del menú del día en `frontend/src/pages/admin/MenuDelDia.tsx` (lista de entradas con precio editable, botones de disponible/especial, agregar platillo del catálogo, eliminar entrada)
-- [ ] T015 [US1] Registrar las rutas `/admin/platillos` y `/admin/menu` en `frontend/src/routes/AppRouter.tsx` y añadir sus enlaces en `frontend/src/components/layout/LayoutPorRol.tsx` (ambos archivos compartidos: editar de forma secuencial)
+- [x] T005 [US1] Definir esquemas zod de platillos en `backend/src/schemas/platillos.schemas.ts` (nombre de 1 a 100 caracteres no vacío; `categoria` en la lista fija de T001; `descripcion` opcional de hasta 500)
+- [x] T006 [US1] Definir esquemas zod del menú en `backend/src/schemas/menu.schemas.ts` (fecha opcional `YYYY-MM-DD` vía `esFechaISO`; `platillo_id` entero positivo; precio numérico > 0 con hasta 2 decimales; `disponible` y `especial` booleanos; FR-008, FR-010)
+- [x] T007 [US1] Implementar `backend/src/services/platillos.service.ts` (listar activos con `?incluirInactivos`, crear con rechazo de nombre duplicado activo, editar, cambiar `activo`; baja lógica sin borrado físico; FR-001, FR-008, FR-012)
+- [x] T008 [US1] Implementar `backend/src/services/menu.service.ts` (listar por fecha; agregar platillo al menú validando existencia, `activo` y no duplicado en la fecha; editar `precio`/`disponible`/`especial`; eliminar entrada; si `pedido_detalle` la referencia, `REFERENCIADO`; FR-002, FR-003, FR-009, FR-010; research R7)
+- [x] T009 [US1] Implementar `backend/src/controllers/platillos.controller.ts`
+- [x] T010 [US1] Implementar `backend/src/controllers/menu.controller.ts` (gestión)
+- [x] T011 [US1] Implementar `backend/src/routes/platillos.routes.ts` con `autenticar` + `autorizarRol('administrador')` (contrato `contracts/platillos-api.md`)
+- [x] T012 [US1] Implementar `backend/src/routes/menu.routes.ts` (prefijo `/api/admin/menu`, solo gestión) y montar `platillos.routes` y `menu.routes` en `backend/src/app.ts` (edita `app.ts`; secuencial respecto a T017)
+- [x] T013 [US1] Implementar la página de catálogo en `frontend/src/pages/admin/Platillos.tsx` (listar, alta, edición, activar/desactivar, selector de categorías, mensajes de conflicto)
+- [x] T014 [US1] Implementar la página del menú del día en `frontend/src/pages/admin/MenuDelDia.tsx` (lista de entradas con precio editable, botones de disponible/especial, agregar platillo del catálogo, eliminar entrada)
+- [x] T015 [US1] Registrar las rutas `/admin/platillos` y `/admin/menu` en `frontend/src/routes/AppRouter.tsx` y añadir sus enlaces en `frontend/src/components/layout/LayoutPorRol.tsx` (ambos archivos compartidos: editar de forma secuencial)
 
 **Checkpoint**: US1 funcional y probable de forma independiente
 
@@ -100,13 +100,13 @@ sin menú.
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T016 [P] [US2] Test unitario de la consulta pública en `backend/tests/menu.consulta.test.ts` sobre `obtenerMenuPublico` de `menu.service` (disponibilidad efectiva = `menu_dia.disponible AND platillo.activo`; orden por categoría, especial primero, nombre; fecha sin menú → lista vacía; el platillo inactivo aparece con `disponible: false`)
+- [x] T016 [P] [US2] Test unitario de la consulta pública en `backend/tests/menu.consulta.test.ts` sobre `obtenerMenuPublico` de `menu.service` (disponibilidad efectiva = `menu_dia.disponible AND platillo.activo`; orden por categoría, especial primero, nombre; fecha sin menú → lista vacía; el platillo inactivo aparece con `disponible: false`)
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Implementar `obtenerMenuPublico(fecha)` en `backend/src/services/menu.service.ts` y `GET /api/menu` público (sin middlewares de sesión) en `backend/src/routes/menu.routes.ts` + `backend/src/controllers/menu.controller.ts` (edita archivos de T008/T010/T012; secuencial; contrato `contracts/menu-api.md`; FR-004, FR-005, FR-006, FR-011)
-- [ ] T018 [US2] Crear `frontend/src/components/menu/TarjetaPlatillo.tsx` (nombre, categoría, descripción, precio y etiquetas de especial y no disponible)
-- [ ] T019 [US2] Reimplementar `frontend/src/pages/clientes/Menu.tsx` (consulta `/api/menu` al montar, agrupa por categoría, muestra especial/no disponible, mensaje claro sin menú, botón de refresco; responsivo móvil; FR-013)
+- [x] T017 [US2] Implementar `obtenerMenuPublico(fecha)` en `backend/src/services/menu.service.ts` y `GET /api/menu` público (sin middlewares de sesión) en `backend/src/routes/menu.routes.ts` + `backend/src/controllers/menu.controller.ts` (edita archivos de T008/T010/T012; secuencial; contrato `contracts/menu-api.md`; FR-004, FR-005, FR-006, FR-011)
+- [x] T018 [US2] Crear `frontend/src/components/menu/TarjetaPlatillo.tsx` (nombre, categoría, descripción, precio y etiquetas de especial y no disponible)
+- [x] T019 [US2] Reimplementar `frontend/src/pages/clientes/Menu.tsx` (consulta `/api/menu` al montar, agrupa por categoría, muestra especial/no disponible, mensaje claro sin menú, botón de refresco; responsivo móvil; FR-013)
 
 **Checkpoint**: US1 y US2 funcionan de forma independiente
 
@@ -116,9 +116,9 @@ sin menú.
 
 **Purpose**: Mejoras que afectan a ambas historias
 
-- [ ] T020 [P] Pruebas de permisos del menú en `backend/tests/permisos.menu.test.ts` (patrón de `permisos.test.ts`, sin tocar la base): `GET /api/admin/platillos` y `GET /api/admin/menu` responden `401` sin token y `403` con rol `usuario` o `cajero`
-- [ ] T021 Verificar que `npm test` y `npm run typecheck` pasan en `backend/` y `frontend/`, y comprobar la responsividad en móvil y escritorio con áreas táctiles ≥ 44 px en `/admin/platillos`, `/admin/menu` y `/menu`
-- [ ] T022 Ejecutar la validación de `specs/003-menu-management/quickstart.md` (5 escenarios)
+- [x] T020 [P] Pruebas de permisos del menú en `backend/tests/permisos.menu.test.ts` (patrón de `permisos.test.ts`, sin tocar la base): `GET /api/admin/platillos` y `GET /api/admin/menu` responden `401` sin token y `403` con rol `usuario` o `cajero`
+- [x] T021 Verificar que `npm test` y `npm run typecheck` pasan en `backend/` y `frontend/`, y comprobar la responsividad en móvil y escritorio con áreas táctiles ≥ 44 px en `/admin/platillos`, `/admin/menu` y `/menu`
+- [x] T022 Ejecutar la validación de `specs/003-menu-management/quickstart.md` (5 escenarios)
 
 ---
 

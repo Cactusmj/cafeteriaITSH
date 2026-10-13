@@ -23,7 +23,7 @@ sprint es un subconjunto trazable de ella (historias, FRs y criterios).
 | Sprint | Semanas (est.) | Feature speckit | Historias de 001 | Demo del sprint | Estado |
 |---|---|---|---|---|---|
 | 1 | 1–2 (2026-10-13 → 10-26) | `specs/002-foundation-auth/` | US1 + US8 | Login por rol y rutas protegidas | Completado (2026-10-13) |
-| 2 | 3–4 (2026-10-27 → 11-09) | `specs/003-menu-management/` | US2 + US3 | Admin publica el menú; alumno lo consulta en el móvil | |
+| 2 | 3–4 (2026-10-27 → 11-09) | `specs/003-menu-management/` | US2 + US3 | Admin publica el menú; alumno lo consulta en el móvil | Implementado y validado (2026-10-13); pendiente de demo |
 | 3 | 5–6 (2026-11-10 → 11-23) | `specs/004-advance-orders-payment/` | US4 | Flujo alumno: menú → pedido → pago anticipado | |
 | 4 | 7–8 (2026-11-24 → 12-07) | `specs/005-counter-kitchen/` | US5 + US6 | Cajero captura mostrador; cocina procesa en pantalla | |
 | 5 | 9–10 (2026-12-08 → 12-21) | `specs/006-order-tracking-notifications/` | US7 + pulido | Notificación de pedido listo + demo completa | |
@@ -79,7 +79,8 @@ escenarios de API en verde) y demo aprobada por la patrocinadora el
 consultan.
 
 **Entra**:
-- Migraciones: tablas `platillos`, `menu_del_dia`, especiales del día.
+- Sin migraciones nuevas: el esquema del Sprint 1 ya crea las tablas
+  `platillo` y `menu_dia` (con su restricción de fecha + platillo).
 - Backend CRUD: platillos, menú del día, especiales, precios, disponibilidad.
 - Frontend admin (`/admin`): gestión de platillos y menú del día.
 - Frontend clientes (`/menu`): consulta del menú con precios, disponibilidad y
@@ -92,6 +93,11 @@ consultan.
   seleccionar para pedir.
 - Los cambios de precio/disponibilidad se reflejan de inmediato en `/menu`.
 - El menú se consulta sin esperas perceptibles en horario de receso (móvil).
+
+**Estado**: implementado y validado — tareas T001–T022 completadas, 52 pruebas
+de backend y 3 de frontend en verde, lint y typecheck en verde, y validación
+del `quickstart.md` ejecutada (20/20 comprobaciones de API en verde,
+2026-10-13). **Pendiente**: demo con la patrocinadora para cerrar el sprint.
 
 ---
 
