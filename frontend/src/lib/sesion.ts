@@ -17,7 +17,7 @@ const CLAVE_USUARIO = 'cafeteria.usuario'
 
 /** Ruta inicial según el rol del usuario. */
 export const INICIO_POR_ROL: Record<Rol, string> = {
-  administrador: '/admin/usuarios',
+  administrador: '/admin',
   cajero: '/caja',
   cocinero: '/cocina',
   usuario: '/menu',

@@ -3,9 +3,11 @@ import { LayoutPorRol } from '../components/layout/LayoutPorRol'
 import { useSesion } from '../lib/useSesion'
 import { INICIO_POR_ROL } from '../lib/sesion'
 import { Usuarios } from '../pages/admin/Usuarios'
+import { InicioAdmin } from '../pages/admin/InicioAdmin'
 import { Platillos } from '../pages/admin/Platillos'
 import { MenuDelDia } from '../pages/admin/MenuDelDia'
 import { Caja } from '../pages/caja/Caja'
+import { Entregas } from '../pages/caja/Entregas'
 import { Login } from '../pages/clientes/Login'
 import { Menu } from '../pages/clientes/Menu'
 import { ConfirmarPedido } from '../pages/clientes/ConfirmarPedido'
@@ -41,12 +43,14 @@ export function AppRouter() {
           </Route>
 
           <Route element={<RutaPorRol roles={['administrador']} />}>
+            <Route path="/admin" element={<InicioAdmin />} />
             <Route path="/admin/usuarios" element={<Usuarios />} />
             <Route path="/admin/platillos" element={<Platillos />} />
             <Route path="/admin/menu" element={<MenuDelDia />} />
           </Route>
           <Route element={<RutaPorRol roles={['cajero']} />}>
             <Route path="/caja" element={<Caja />} />
+            <Route path="/caja/entregas" element={<Entregas />} />
           </Route>
           <Route element={<RutaPorRol roles={['cocinero']} />}>
             <Route path="/cocina" element={<Cocina />} />

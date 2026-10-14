@@ -105,4 +105,37 @@ describe('guardas de rutas', () => {
     expect(await screen.findByRole('heading', { name: /^caja$/i })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /mis pedidos/i })).not.toBeInTheDocument()
   })
+
+  it('permite al admin abrir el inicio', async () => {
+    simularSesion('administrador')
+    renderizar('/admin')
+    expect(await screen.findByRole('heading', { name: /^inicio$/i })).toBeInTheDocument()
+  })
+
+  it('permite al cajero abrir entregas', async () => {
+    simularSesion('cajero')
+    renderizar('/caja/entregas')
+    expect(await screen.findByRole('heading', { name: /^entregas$/i })).toBeInTheDocument()
+  })
+
+  it('muestra el aviso de listo en la navegación del cliente', async () => {
+    simularSesion('usuario')
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation((url: string) => {
+        let cuerpo: unknown = { fecha: '2026-10-13', entradas: [], platillos: [] }
+        if (url.includes('/api/avisos')) {
+          cuerpo = { avisos: [{ id: 1, estado_envio: 'enviada' }] }
+        }
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: async () => cuerpo,
+        })
+      }),
+    )
+    renderizar('/menu')
+    const avisos = await screen.findAllByLabelText(/listos para recoger/i)
+    expect(avisos.length).toBeGreaterThanOrEqual(1)
+  })
 })
