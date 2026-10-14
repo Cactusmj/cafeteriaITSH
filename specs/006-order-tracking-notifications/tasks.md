@@ -114,7 +114,7 @@ avisos de punta a punta
 - [x] T013 [P] Pruebas de permisos en `backend/tests/permisos.avisos.test.ts` (servidor efímero, sin base): 3 endpoints responden `401` sin token; `403` con cajero/cocinero en los tres; cliente ajeno ve `403` en detalle ajeno y solo lo propio en listas
 - [x] T014 [P] Ampliar `frontend/src/routes/rutas.test.tsx` (cliente ve `/mis-pedidos`; cajero es redirigido fuera)
 - [x] T015 Verificar que `npm test` y `npm run typecheck` pasan en `backend/` y `frontend/`, `npm run lint` en `frontend/`, y comprobar áreas ≥ 44 px y contraste en `/mis-pedidos`
-- [ ] T016 Ejecutar la validación de `specs/006-order-tracking-notifications/quickstart.md` (5 escenarios, incluido el flujo completo del MVP)
+- [x] T016 Ejecutar la validación de `specs/006-order-tracking-notifications/quickstart.md` (5 escenarios, incluido el flujo completo del MVP)
 
 ---
 
