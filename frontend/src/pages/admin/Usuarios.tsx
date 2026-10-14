@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { Boton } from '../../components/ui/Boton'
+import { Campo } from '../../components/ui/Campo'
+import { EstadoVacio } from '../../components/ui/EstadoVacio'
+import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
 import { useSesion } from '../../lib/useSesion'
 
@@ -11,13 +15,6 @@ interface UsuarioOperativo {
   rol: RolOperativo
   activo: boolean
 }
-
-const claseCampo =
-  'w-full rounded border border-slate-300 px-3 py-2 text-base focus:border-slate-900 focus:outline-none'
-const claseBoton =
-  'inline-flex min-h-11 items-center justify-center rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60'
-const claseBotonSecundario =
-  'inline-flex min-h-11 items-center justify-center rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100'
 
 /** Panel del administrador para gestionar cuentas operativas. */
 export function Usuarios() {
@@ -105,74 +102,50 @@ export function Usuarios() {
 
   return (
     <section className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-slate-900">Gestión de usuarios</h1>
+      <h1 className="font-heading text-2xl font-bold text-on-surface">Gestión de usuarios</h1>
 
       {error && (
-        <p role="alert" className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="rounded-lg bg-error-container px-3 py-2 text-sm text-on-error-container">
           {error}
         </p>
       )}
 
-      <form
-        onSubmit={crear}
-        className="grid gap-3 rounded border border-slate-200 bg-white p-4 sm:grid-cols-2"
-      >
-        <h2 className="sm:col-span-2 text-lg font-medium text-slate-900">Nueva cuenta operativa</h2>
-        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Nombre
-          <input
-            type="text"
-            required
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            className={claseCampo}
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Correo
-          <input
-            type="email"
-            required
-            value={correo}
-            onChange={(e) => setCorreo(e.target.value)}
-            className={claseCampo}
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Contraseña
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={claseCampo}
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Rol
-          <select
-            value={rol}
-            onChange={(e) => setRol(e.target.value as RolOperativo)}
-            className={claseCampo}
-          >
-            <option value="cajero">Cajero</option>
-            <option value="cocinero">Cocinero</option>
-          </select>
-        </label>
-        <div className="sm:col-span-2">
-          <button type="submit" disabled={creando} className={claseBoton}>
-            {creando ? 'Creando…' : 'Crear usuario'}
-          </button>
-        </div>
-      </form>
+      <Tarjeta className="p-4">
+        <form onSubmit={crear} className="grid gap-3 sm:grid-cols-2">
+          <h2 className="font-heading text-lg font-bold text-on-surface sm:col-span-2">Nueva cuenta operativa</h2>
+          <Campo etiqueta="Nombre" type="text" required value={nombre} onChange={(e) => setNombre(e.target.value)} />
+          <Campo etiqueta="Correo" type="email" required value={correo} onChange={(e) => setCorreo(e.target.value)} />
+          <Campo etiqueta="Contraseña" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+          <label className="flex flex-col gap-1 text-sm font-medium text-on-surface-variant">
+            <span>Rol</span>
+            <select
+              value={rol}
+              onChange={(e) => setRol(e.target.value as RolOperativo)}
+              className="min-h-11 w-full rounded-lg border border-outline bg-surface-container-lowest px-3 py-2 text-base text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="cajero">Cajero</option>
+              <option value="cocinero">Cocinero</option>
+            </select>
+          </label>
+          <div className="sm:col-span-2">
+            <Boton type="submit" disabled={creando}>
+              {creando ? 'Creando…' : 'Crear usuario'}
+            </Boton>
+          </div>
+        </form>
+      </Tarjeta>
 
       {cargando ? (
-        <p className="text-slate-600">Cargando usuarios…</p>
+        <p className="text-on-surface-variant">Cargando usuarios…</p>
+      ) : usuarios.length === 0 ? (
+        <EstadoVacio
+          titulo="Aún no hay usuarios operativos"
+          descripcion="Crea la primera cuenta con el formulario."
+        />
       ) : (
-        <div className="overflow-x-auto rounded border border-slate-200 bg-white">
+        <div className="overflow-x-auto rounded-xl border border-outline-variant bg-surface-container-lowest">
           <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600">
+            <thead className="bg-surface-container text-on-surface-variant">
               <tr>
                 <th className="px-4 py-3 font-medium">Nombre</th>
                 <th className="px-4 py-3 font-medium">Correo</th>
@@ -183,45 +156,37 @@ export function Usuarios() {
             </thead>
             <tbody>
               {usuarios.map((usuario) => (
-                <tr key={usuario.id} className="border-t border-slate-100">
-                  <td className="px-4 py-3">{usuario.nombre}</td>
-                  <td className="px-4 py-3">{usuario.correo}</td>
-                  <td className="px-4 py-3">
+                <tr key={usuario.id} className="border-t border-outline-variant">
+                  <td className="px-4 py-4 font-medium text-on-surface">{usuario.nombre}</td>
+                  <td className="px-4 py-4 text-on-surface">{usuario.correo}</td>
+                  <td className="px-4 py-4">
                     <select
                       value={usuario.rol}
                       onChange={(e) => void cambiarRol(usuario, e.target.value as RolOperativo)}
-                      className={claseCampo}
+                      className="min-h-11 rounded-lg border border-outline bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
                       aria-label={`Rol de ${usuario.nombre}`}
                     >
                       <option value="cajero">Cajero</option>
                       <option value="cocinero">Cocinero</option>
                     </select>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-4">
                     {usuario.activo ? (
-                      <span className="text-green-700">Activo</span>
+                      <span className="font-medium text-primary">Activo</span>
                     ) : (
-                      <span className="text-slate-500">Inactivo</span>
+                      <span className="text-on-surface-variant">Inactivo</span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
-                    <button
-                      type="button"
+                  <td className="px-4 py-4">
+                    <Boton
+                      variante="secundario"
                       onClick={() => void cambiarEstado(usuario)}
-                      className={claseBotonSecundario}
                     >
                       {usuario.activo ? 'Deshabilitar' : 'Habilitar'}
-                    </button>
+                    </Boton>
                   </td>
                 </tr>
               ))}
-              {usuarios.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-slate-500">
-                    No hay cuentas operativas registradas.
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>

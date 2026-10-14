@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { Boton } from '../../components/ui/Boton'
+import { Campo } from '../../components/ui/Campo'
+import { EstadoVacio } from '../../components/ui/EstadoVacio'
+import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
 import { useSesion } from '../../lib/useSesion'
 
@@ -20,13 +24,6 @@ interface PlatilloCatalogo {
   categoria: string | null
   activo: boolean
 }
-
-const claseCampo =
-  'w-full rounded border border-slate-300 px-3 py-2 text-base focus:border-slate-900 focus:outline-none'
-const claseBoton =
-  'inline-flex min-h-11 items-center justify-center rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60'
-const claseBotonSecundario =
-  'inline-flex min-h-11 items-center justify-center rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100'
 
 /** Gestión del menú del día para el administrador. */
 export function MenuDelDia() {
@@ -116,71 +113,70 @@ export function MenuDelDia() {
   return (
     <section className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Menú del día</h1>
-        {fecha && <p className="text-sm text-slate-600">Fecha: {fecha}</p>}
+        <h1 className="font-heading text-2xl font-bold text-on-surface">Menú del día</h1>
+        {fecha && <p className="text-sm text-on-surface-variant">Fecha: {fecha}</p>}
       </div>
 
       {error && (
-        <p role="alert" className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error}
-        </p>
+        <EstadoVacio titulo="No se pudo cargar el menú del día" descripcion={error} onReintentar={refrescar} />
       )}
 
-      <form
-        onSubmit={agregar}
-        className="grid gap-3 rounded border border-slate-200 bg-white p-4 sm:grid-cols-3"
-      >
-        <h2 className="sm:col-span-3 text-lg font-medium text-slate-900">Agregar platillo al menú</h2>
-        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Platillo
-          <select
-            required
-            value={platilloId}
-            onChange={(e) => setPlatilloId(e.target.value)}
-            className={claseCampo}
-          >
-            <option value="">Selecciona un platillo…</option>
-            {platillos.map((platillo) => (
-              <option key={platillo.id} value={platillo.id}>
-                {platillo.nombre}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Precio
-          <input
+      <Tarjeta className="p-4">
+        <form onSubmit={agregar} className="grid gap-3 sm:grid-cols-3">
+          <h2 className="font-heading text-lg font-bold text-on-surface sm:col-span-3">Agregar platillo al menú</h2>
+          <label className="flex flex-col gap-1 text-sm font-medium text-on-surface-variant">
+            <span>Platillo</span>
+            <select
+              required
+              value={platilloId}
+              onChange={(e) => setPlatilloId(e.target.value)}
+              className="min-h-11 w-full rounded-lg border border-outline bg-surface-container-lowest px-3 py-2 text-base text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="">Selecciona un platillo…</option>
+              {platillos.map((platillo) => (
+                <option key={platillo.id} value={platillo.id}>
+                  {platillo.nombre}
+                </option>
+              ))}
+            </select>
+          </label>
+          <Campo
+            etiqueta="Precio"
             type="number"
             required
             min="0.01"
             step="0.01"
             value={precio}
             onChange={(e) => setPrecio(e.target.value)}
-            className={claseCampo}
           />
-        </label>
-        <label className="flex items-end gap-2 pb-2 text-sm font-medium text-slate-700">
-          <input
-            type="checkbox"
-            checked={especial}
-            onChange={(e) => setEspecial(e.target.checked)}
-            className="size-5"
-          />
-          Especial del día
-        </label>
-        <div className="sm:col-span-3">
-          <button type="submit" disabled={agregando} className={claseBoton}>
-            {agregando ? 'Agregando…' : 'Agregar al menú'}
-          </button>
-        </div>
-      </form>
+          <label className="flex min-h-11 flex-row items-center gap-2 text-sm font-medium text-on-surface-variant sm:pt-6">
+            <input
+              type="checkbox"
+              checked={especial}
+              onChange={(e) => setEspecial(e.target.checked)}
+              className="size-5 accent-primary"
+            />
+            Especial del día
+          </label>
+          <div className="sm:col-span-3">
+            <Boton type="submit" disabled={agregando}>
+              {agregando ? 'Agregando…' : 'Agregar al menú'}
+            </Boton>
+          </div>
+        </form>
+      </Tarjeta>
 
       {cargando ? (
-        <p className="text-slate-600">Cargando menú del día…</p>
+        <p className="text-on-surface-variant">Cargando menú del día…</p>
+      ) : entradas.length === 0 ? (
+        <EstadoVacio
+          titulo="No hay menú publicado para esta fecha"
+          descripcion="Agrega platillos con el formulario."
+        />
       ) : (
-        <div className="overflow-x-auto rounded border border-slate-200 bg-white">
+        <div className="overflow-x-auto rounded-xl border border-outline-variant bg-surface-container-lowest">
           <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600">
+            <thead className="bg-surface-container text-on-surface-variant">
               <tr>
                 <th className="px-4 py-3 font-medium">Platillo</th>
                 <th className="px-4 py-3 font-medium">Precio</th>
@@ -191,16 +187,16 @@ export function MenuDelDia() {
             </thead>
             <tbody>
               {entradas.map((entrada) => (
-                <tr key={entrada.id} className="border-t border-slate-100">
-                  <td className="px-4 py-3">
+                <tr key={entrada.id} className="border-t border-outline-variant">
+                  <td className="px-4 py-4 font-medium text-on-surface">
                     {entrada.platillo}
                     {!entrada.platillo_activo && (
-                      <span className="ml-2 rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+                      <span className="ml-2 rounded-full bg-surface-container px-2 py-0.5 text-xs text-on-surface-variant">
                         Platillo desactivado
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-4">
                     <input
                       type="number"
                       min="0.01"
@@ -212,46 +208,36 @@ export function MenuDelDia() {
                           void actualizar(entrada.id, { precio: valor })
                         }
                       }}
-                      className={`${claseCampo} max-w-28`}
+                      className="min-h-11 w-full max-w-28 rounded-lg border border-outline bg-surface-container-lowest px-3 py-2 text-base text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
                       aria-label={`Precio de ${entrada.platillo}`}
                     />
                   </td>
-                  <td className="px-4 py-3">
-                    <button
-                      type="button"
+                  <td className="px-4 py-4">
+                    <Boton
+                      variante="secundario"
                       onClick={() => void actualizar(entrada.id, { disponible: !entrada.disponible })}
-                      className={claseBotonSecundario}
                     >
                       {entrada.disponible ? 'Disponible' : 'No disponible'}
-                    </button>
+                    </Boton>
                   </td>
-                  <td className="px-4 py-3">
-                    <button
-                      type="button"
+                  <td className="px-4 py-4">
+                    <Boton
+                      variante="secundario"
                       onClick={() => void actualizar(entrada.id, { especial: !entrada.especial })}
-                      className={claseBotonSecundario}
                     >
                       {entrada.especial ? 'Sí' : 'No'}
-                    </button>
+                    </Boton>
                   </td>
-                  <td className="px-4 py-3">
-                    <button
-                      type="button"
+                  <td className="px-4 py-4">
+                    <Boton
+                      variante="secundario"
                       onClick={() => void eliminar(entrada.id)}
-                      className={claseBotonSecundario}
                     >
                       Quitar del menú
-                    </button>
+                    </Boton>
                   </td>
                 </tr>
               ))}
-              {entradas.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-slate-500">
-                    No hay platillos en el menú de hoy.
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>

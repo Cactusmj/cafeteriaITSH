@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { Boton } from '../../components/ui/Boton'
+import { Campo } from '../../components/ui/Campo'
+import { EstadoVacio } from '../../components/ui/EstadoVacio'
+import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
 import { useSesion } from '../../lib/useSesion'
 import { CATEGORIAS, ETIQUETA_CATEGORIA, type Categoria } from '../../lib/categorias'
@@ -10,13 +14,6 @@ interface Platillo {
   descripcion: string | null
   activo: boolean
 }
-
-const claseCampo =
-  'w-full rounded border border-slate-300 px-3 py-2 text-base focus:border-slate-900 focus:outline-none'
-const claseBoton =
-  'inline-flex min-h-11 items-center justify-center rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60'
-const claseBotonSecundario =
-  'inline-flex min-h-11 items-center justify-center rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100'
 
 /** Catálogo de platillos para el administrador. */
 export function Platillos() {
@@ -121,86 +118,24 @@ export function Platillos() {
 
   return (
     <section className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-slate-900">Platillos</h1>
+      <h1 className="font-heading text-2xl font-bold text-on-surface">Platillos</h1>
 
       {error && (
-        <p role="alert" className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="rounded-lg bg-error-container px-3 py-2 text-sm text-on-error-container">
           {error}
         </p>
       )}
 
-      <form
-        onSubmit={crear}
-        className="grid gap-3 rounded border border-slate-200 bg-white p-4 sm:grid-cols-2"
-      >
-        <h2 className="sm:col-span-2 text-lg font-medium text-slate-900">Nuevo platillo</h2>
-        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Nombre
-          <input
-            type="text"
-            required
-            maxLength={100}
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            className={claseCampo}
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-          Categoría
-          <select
-            value={categoria}
-            onChange={(e) => setCategoria(e.target.value as Categoria)}
-            className={claseCampo}
-          >
-            {CATEGORIAS.map((opcion) => (
-              <option key={opcion} value={opcion}>
-                {ETIQUETA_CATEGORIA[opcion]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 sm:col-span-2">
-          Descripción (opcional)
-          <input
-            type="text"
-            maxLength={500}
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-            className={claseCampo}
-          />
-        </label>
-        <div className="sm:col-span-2">
-          <button type="submit" disabled={creando} className={claseBoton}>
-            {creando ? 'Creando…' : 'Crear platillo'}
-          </button>
-        </div>
-      </form>
-
-      {editando && (
-        <form
-          onSubmit={guardarEdicion}
-          className="grid gap-3 rounded border border-slate-900 bg-white p-4 sm:grid-cols-2"
-        >
-          <h2 className="sm:col-span-2 text-lg font-medium text-slate-900">
-            Editando: {editando.nombre}
-          </h2>
-          <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-            Nombre
-            <input
-              type="text"
-              required
-              maxLength={100}
-              value={nombreEdicion}
-              onChange={(e) => setNombreEdicion(e.target.value)}
-              className={claseCampo}
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
-            Categoría
+      <Tarjeta className="p-4">
+        <form onSubmit={crear} className="grid gap-3 sm:grid-cols-2">
+          <h2 className="font-heading text-lg font-bold text-on-surface sm:col-span-2">Nuevo platillo</h2>
+          <Campo etiqueta="Nombre" type="text" required maxLength={100} value={nombre} onChange={(e) => setNombre(e.target.value)} />
+          <label className="flex flex-col gap-1 text-sm font-medium text-on-surface-variant">
+            <span>Categoría</span>
             <select
-              value={categoriaEdicion}
-              onChange={(e) => setCategoriaEdicion(e.target.value as Categoria)}
-              className={claseCampo}
+              value={categoria}
+              onChange={(e) => setCategoria(e.target.value as Categoria)}
+              className="min-h-11 w-full rounded-lg border border-outline bg-surface-container-lowest px-3 py-2 text-base text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
             >
               {CATEGORIAS.map((opcion) => (
                 <option key={opcion} value={opcion}>
@@ -209,33 +144,62 @@ export function Platillos() {
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 sm:col-span-2">
-            Descripción (opcional)
-            <input
-              type="text"
-              maxLength={500}
-              value={descripcionEdicion}
-              onChange={(e) => setDescripcionEdicion(e.target.value)}
-              className={claseCampo}
-            />
-          </label>
-          <div className="flex gap-2 sm:col-span-2">
-            <button type="submit" className={claseBoton}>
-              Guardar cambios
-            </button>
-            <button type="button" onClick={() => setEditando(null)} className={claseBotonSecundario}>
-              Cancelar
-            </button>
+          <div className="sm:col-span-2">
+            <Campo etiqueta="Descripción (opcional)" type="text" maxLength={500} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
+          </div>
+          <div className="sm:col-span-2">
+            <Boton type="submit" disabled={creando}>
+              {creando ? 'Creando…' : 'Crear platillo'}
+            </Boton>
           </div>
         </form>
+      </Tarjeta>
+
+      {editando && (
+        <Tarjeta className="border-primary p-4">
+          <form onSubmit={guardarEdicion} className="grid gap-3 sm:grid-cols-2">
+            <h2 className="font-heading text-lg font-bold text-on-surface sm:col-span-2">
+              Editando: {editando.nombre}
+            </h2>
+            <Campo etiqueta="Nombre" type="text" required maxLength={100} value={nombreEdicion} onChange={(e) => setNombreEdicion(e.target.value)} />
+            <label className="flex flex-col gap-1 text-sm font-medium text-on-surface-variant">
+              <span>Categoría</span>
+              <select
+                value={categoriaEdicion}
+                onChange={(e) => setCategoriaEdicion(e.target.value as Categoria)}
+                className="min-h-11 w-full rounded-lg border border-outline bg-surface-container-lowest px-3 py-2 text-base text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                {CATEGORIAS.map((opcion) => (
+                  <option key={opcion} value={opcion}>
+                    {ETIQUETA_CATEGORIA[opcion]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="sm:col-span-2">
+              <Campo etiqueta="Descripción (opcional)" type="text" maxLength={500} value={descripcionEdicion} onChange={(e) => setDescripcionEdicion(e.target.value)} />
+            </div>
+            <div className="flex gap-2 sm:col-span-2">
+              <Boton type="submit">Guardar cambios</Boton>
+              <Boton type="button" variante="secundario" onClick={() => setEditando(null)}>
+                Cancelar
+              </Boton>
+            </div>
+          </form>
+        </Tarjeta>
       )}
 
       {cargando ? (
-        <p className="text-slate-600">Cargando platillos…</p>
+        <p className="text-on-surface-variant">Cargando platillos…</p>
+      ) : platillos.length === 0 ? (
+        <EstadoVacio
+          titulo="El catálogo está vacío"
+          descripcion="Crea el primer platillo con el formulario."
+        />
       ) : (
-        <div className="overflow-x-auto rounded border border-slate-200 bg-white">
+        <div className="overflow-x-auto rounded-xl border border-outline-variant bg-surface-container-lowest">
           <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600">
+            <thead className="bg-surface-container text-on-surface-variant">
               <tr>
                 <th className="px-4 py-3 font-medium">Nombre</th>
                 <th className="px-4 py-3 font-medium">Categoría</th>
@@ -246,50 +210,38 @@ export function Platillos() {
             </thead>
             <tbody>
               {platillos.map((platillo) => (
-                <tr key={platillo.id} className="border-t border-slate-100">
-                  <td className="px-4 py-3">{platillo.nombre}</td>
-                  <td className="px-4 py-3">
+                <tr key={platillo.id} className="border-t border-outline-variant">
+                  <td className="px-4 py-4 font-medium text-on-surface">{platillo.nombre}</td>
+                  <td className="px-4 py-4 text-on-surface">
                     {platillo.categoria && platillo.categoria in ETIQUETA_CATEGORIA
                       ? ETIQUETA_CATEGORIA[platillo.categoria as Categoria]
                       : platillo.categoria ?? '—'}
                   </td>
-                  <td className="max-w-xs truncate px-4 py-3 text-slate-600">
+                  <td className="max-w-xs truncate px-4 py-4 text-on-surface-variant">
                     {platillo.descripcion ?? '—'}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-4">
                     {platillo.activo ? (
-                      <span className="text-green-700">Activo</span>
+                      <span className="font-medium text-primary">Activo</span>
                     ) : (
-                      <span className="text-slate-500">Inactivo</span>
+                      <span className="text-on-surface-variant">Inactivo</span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-4">
                     <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => prepararEdicion(platillo)}
-                        className={claseBotonSecundario}
-                      >
+                      <Boton variante="secundario" onClick={() => prepararEdicion(platillo)}>
                         Editar
-                      </button>
-                      <button
-                        type="button"
+                      </Boton>
+                      <Boton
+                        variante="secundario"
                         onClick={() => void cambiarEstado(platillo)}
-                        className={claseBotonSecundario}
                       >
                         {platillo.activo ? 'Desactivar' : 'Activar'}
-                      </button>
+                      </Boton>
                     </div>
                   </td>
                 </tr>
               ))}
-              {platillos.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-slate-500">
-                    No hay platillos registrados.
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
