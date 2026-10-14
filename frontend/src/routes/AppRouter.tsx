@@ -34,9 +34,9 @@ export function AppRouter() {
       <Route element={<RutaProtegida />}>
         <Route element={<LayoutPorRol />}>
           <Route path="/menu" element={<Menu />} />
-          <Route path="/mis-pedidos" element={<MisPedidos />} />
 
           <Route element={<RutaPorRol roles={['usuario']} />}>
+            <Route path="/mis-pedidos" element={<MisPedidos />} />
             <Route path="/confirmar-pedido" element={<ConfirmarPedido />} />
           </Route>
 

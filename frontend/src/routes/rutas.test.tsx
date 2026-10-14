@@ -92,4 +92,17 @@ describe('guardas de rutas', () => {
     expect(await screen.findByRole('heading', { name: /menú del día/i })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /^caja$/i })).not.toBeInTheDocument()
   })
+
+  it('permite al cliente abrir mis pedidos', async () => {
+    simularSesion('usuario')
+    renderizar('/mis-pedidos')
+    expect(await screen.findByRole('heading', { name: /mis pedidos/i })).toBeInTheDocument()
+  })
+
+  it('impide que un cajero abra mis pedidos', async () => {
+    simularSesion('cajero')
+    renderizar('/mis-pedidos')
+    expect(await screen.findByRole('heading', { name: /^caja$/i })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /mis pedidos/i })).not.toBeInTheDocument()
+  })
 })
