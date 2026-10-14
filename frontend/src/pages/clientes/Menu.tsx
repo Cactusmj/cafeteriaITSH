@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { TarjetaPlatillo } from '../../components/menu/TarjetaPlatillo'
 import { api, ErrorPeticion } from '../../lib/api'
+import {
+  guardarCarrito,
+  leerCarrito,
+  totalCarrito,
+  type LineaCarrito,
+} from '../../lib/carrito'
 import { ETIQUETA_CATEGORIA, type Categoria } from '../../lib/categorias'
 import { useSesion } from '../../lib/useSesion'
 
@@ -24,6 +31,7 @@ export function Menu() {
   const [fecha, setFecha] = useState<string | null>(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [carrito, setCarrito] = useState<LineaCarrito[]>(() => leerCarrito())
 
   const cargar = useCallback(async () => {
     try {
@@ -46,6 +54,49 @@ export function Menu() {
   useEffect(() => {
     void Promise.resolve().then(cargar)
   }, [cargar])
+
+  const actualizarCarrito = useCallback((lineas: LineaCarrito[]) => {
+    setCarrito(lineas)
+    guardarCarrito(lineas)
+  }, [])
+
+  const agregarAlCarrito = useCallback(
+    (platillo: PlatilloMenu) => {
+      const existente = carrito.find((linea) => linea.menu_dia_id === platillo.id)
+      if (existente) {
+        actualizarCarrito(
+          carrito.map((linea) =>
+            linea.menu_dia_id === platillo.id ? { ...linea, cantidad: linea.cantidad + 1 } : linea,
+          ),
+        )
+        return
+      }
+      actualizarCarrito([
+        ...carrito,
+        { menu_dia_id: platillo.id, platillo: platillo.platillo, precio: platillo.precio, cantidad: 1 },
+      ])
+    },
+    [carrito, actualizarCarrito],
+  )
+
+  const quitarDelCarrito = useCallback(
+    (platillo: PlatilloMenu) => {
+      const existente = carrito.find((linea) => linea.menu_dia_id === platillo.id)
+      if (!existente) {
+        return
+      }
+      if (existente.cantidad <= 1) {
+        actualizarCarrito(carrito.filter((linea) => linea.menu_dia_id !== platillo.id))
+        return
+      }
+      actualizarCarrito(
+        carrito.map((linea) =>
+          linea.menu_dia_id === platillo.id ? { ...linea, cantidad: linea.cantidad - 1 } : linea,
+        ),
+      )
+    },
+    [carrito, actualizarCarrito],
+  )
 
   const porCategoria = platillos.reduce<Record<string, PlatilloMenu[]>>((acumulado, platillo) => {
     const clave = platillo.categoria ?? 'sin categoria'
@@ -97,11 +148,30 @@ export function Menu() {
                   precio={platillo.precio}
                   disponible={platillo.disponible}
                   especial={platillo.especial}
+                  cantidad={carrito.find((linea) => linea.menu_dia_id === platillo.id)?.cantidad ?? 0}
+                  onAgregar={() => agregarAlCarrito(platillo)}
+                  onQuitar={() => quitarDelCarrito(platillo)}
                 />
               ))}
             </div>
           </div>
         ))
+      )}
+
+      {carrito.length > 0 && (
+        <div className="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded border border-slate-200 bg-white px-4 py-3 shadow">
+          <p className="text-sm text-slate-700">
+            <span className="font-semibold">{carrito.length}</span>
+            {carrito.length === 1 ? ' platillo en el carrito' : ' platillos en el carrito'} · total{' '}
+            <span className="font-semibold">${totalCarrito(carrito)}</span>
+          </p>
+          <Link
+            to="/confirmar-pedido"
+            className="inline-flex min-h-11 items-center justify-center rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+          >
+            Continuar pedido
+          </Link>
+        </div>
       )}
     </section>
   )

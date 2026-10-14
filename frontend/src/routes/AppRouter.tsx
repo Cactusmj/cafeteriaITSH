@@ -8,6 +8,7 @@ import { MenuDelDia } from '../pages/admin/MenuDelDia'
 import { Caja } from '../pages/caja/Caja'
 import { Login } from '../pages/clientes/Login'
 import { Menu } from '../pages/clientes/Menu'
+import { ConfirmarPedido } from '../pages/clientes/ConfirmarPedido'
 import { MisPedidos } from '../pages/clientes/MisPedidos'
 import { Registro } from '../pages/clientes/Registro'
 import { Cocina } from '../pages/cocina/Cocina'
@@ -34,6 +35,10 @@ export function AppRouter() {
         <Route element={<LayoutPorRol />}>
           <Route path="/menu" element={<Menu />} />
           <Route path="/mis-pedidos" element={<MisPedidos />} />
+
+          <Route element={<RutaPorRol roles={['usuario']} />}>
+            <Route path="/confirmar-pedido" element={<ConfirmarPedido />} />
+          </Route>
 
           <Route element={<RutaPorRol roles={['administrador']} />}>
             <Route path="/admin/usuarios" element={<Usuarios />} />

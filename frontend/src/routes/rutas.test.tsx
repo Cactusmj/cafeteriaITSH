@@ -60,4 +60,36 @@ describe('guardas de rutas', () => {
     expect(await screen.findByRole('heading', { name: /menú del día/i })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /gestión de usuarios/i })).not.toBeInTheDocument()
   })
+
+  it('permite al cliente abrir la confirmación del pedido', async () => {
+    simularSesion('usuario')
+    renderizar('/confirmar-pedido')
+    expect(await screen.findByRole('heading', { name: /confirmar pedido/i })).toBeInTheDocument()
+  })
+
+  it('impide a un cajero abrir la confirmación del pedido', async () => {
+    simularSesion('cajero')
+    renderizar('/confirmar-pedido')
+    expect(await screen.findByRole('heading', { name: /pedido de mostrador|caja/i })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /confirmar pedido/i })).not.toBeInTheDocument()
+  })
+
+  it('permite al cajero abrir la caja', async () => {
+    simularSesion('cajero')
+    renderizar('/caja')
+    expect(await screen.findByRole('heading', { name: /^caja$/i })).toBeInTheDocument()
+  })
+
+  it('permite al cocinero abrir la cocina', async () => {
+    simularSesion('cocinero')
+    renderizar('/cocina')
+    expect(await screen.findByRole('heading', { name: /^cocina$/i })).toBeInTheDocument()
+  })
+
+  it('impide que un cliente abra la caja o la cocina', async () => {
+    simularSesion('usuario')
+    renderizar('/caja')
+    expect(await screen.findByRole('heading', { name: /menú del día/i })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /^caja$/i })).not.toBeInTheDocument()
+  })
 })

@@ -8,10 +8,26 @@ interface Props {
   precio: string
   disponible: boolean
   especial: boolean
+  cantidad?: number
+  onAgregar?: () => void
+  onQuitar?: () => void
 }
 
+const claseBotonCantidad =
+  'inline-flex min-h-11 min-w-11 items-center justify-center rounded border border-slate-300 bg-white px-3 text-base font-semibold text-slate-900 hover:bg-slate-100'
+
 /** Tarjeta de un platillo del menú para la consulta de clientes. */
-export function TarjetaPlatillo({ platillo, categoria, descripcion, precio, disponible, especial }: Props) {
+export function TarjetaPlatillo({
+  platillo,
+  categoria,
+  descripcion,
+  precio,
+  disponible,
+  especial,
+  cantidad = 0,
+  onAgregar,
+  onQuitar,
+}: Props) {
   const etiquetaCategoria = categoria && categoria in ETIQUETA_CATEGORIA
     ? ETIQUETA_CATEGORIA[categoria as Categoria]
     : categoria
@@ -47,6 +63,35 @@ export function TarjetaPlatillo({ platillo, categoria, descripcion, precio, disp
           </span>
         )}
       </div>
+
+      {onAgregar && (
+        <div className="flex items-center gap-3 pt-2">
+          {onQuitar && cantidad > 0 && (
+            <button
+              type="button"
+              onClick={onQuitar}
+              aria-label={`Quitar una porción de ${platillo}`}
+              className={claseBotonCantidad}
+            >
+              −
+            </button>
+          )}
+          {cantidad > 0 && (
+            <span aria-label={`Cantidad de ${platillo}`} className="min-w-6 text-center text-base font-semibold text-slate-900">
+              {cantidad}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={onAgregar}
+            disabled={!disponible}
+            aria-label={`Agregar ${platillo} al carrito`}
+            className="inline-flex min-h-11 items-center justify-center rounded bg-slate-900 px-4 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60"
+          >
+            Agregar
+          </button>
+        </div>
+      )}
     </article>
   )
 }
