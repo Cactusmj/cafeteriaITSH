@@ -12,6 +12,8 @@ export const env = {
   paymentProvider: process.env.PAYMENT_PROVIDER ?? 'sandbox',
   paymentApiKey: process.env.PAYMENT_API_KEY ?? '',
   paymentSandboxModo: process.env.PAYMENT_SANDBOX_MODO ?? 'exito',
+  notificationProvider: process.env.NOTIFICATION_PROVIDER ?? 'ninguno',
+  notificationApiKey: process.env.NOTIFICATION_API_KEY ?? '',
   db: {
     host: process.env.DB_HOST ?? '127.0.0.1',
     port: Number(process.env.DB_PORT ?? 3306),

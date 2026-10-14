@@ -5,6 +5,7 @@ import { ROL } from '../config/roles.js';
 import { ErrorAplicacion, errorProhibido } from '../utils/errores.js';
 import { anticipacionInsuficiente } from '../utils/fecha.js';
 import { destinoPermitido } from '../config/estados.js';
+import { emitirAvisoListo } from './avisos/avisos.service.js';
 import { obtenerProveedorPago, type ProveedorPago } from './pagos/proveedor-pago.js';
 
 const ALFABETO_FOLIO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -444,6 +445,10 @@ export async function avanzarEstado(
      VALUES (?, ?, ?, ?)`,
     [id, anterior.id, nuevo.id, solicitante.id],
   );
+
+  if (destino === 'Listo' && fila.usuario_id != null) {
+    await emitirAvisoListo({ pedidoId: id, usuarioId: fila.usuario_id, numero: fila.numero });
+  }
 
   return { id: fila.id, numero: fila.numero, estado_anterior: fila.estado, estado: destino };
 }

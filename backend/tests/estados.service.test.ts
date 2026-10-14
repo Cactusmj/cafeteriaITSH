@@ -149,3 +149,72 @@ describe('pedidos.service.avanzarEstado (cajero)', () => {
     expect(ejecutar).not.toHaveBeenCalled();
   });
 });
+
+describe('pedidos.service.avanzarEstado dispara avisos', () => {
+  const filaEnPreparacion = { ...filaPagado, estado: 'En preparación' };
+
+  it('genera el aviso al confirmar Listo con dueño', async () => {
+    ejecutar
+      .mockResolvedValueOnce([[filaEnPreparacion], []])
+      .mockResolvedValueOnce([[{ valida: 1 }], []])
+      .mockResolvedValueOnce([
+        [
+          { id: 3, nombre: 'En preparación' },
+          { id: 4, nombre: 'Listo' },
+        ],
+        [],
+      ])
+      .mockResolvedValueOnce([{ affectedRows: 1 }, []])
+      .mockResolvedValueOnce([{ insertId: 9 }, []])
+      .mockResolvedValueOnce([{ insertId: 11 }, []]);
+
+    const cambio = await avanzarEstado(4, cocinero, 'Listo');
+
+    expect(cambio.estado).toBe('Listo');
+    expect(ejecutar).toHaveBeenCalledTimes(6);
+    const sqlAviso = String(ejecutar.mock.calls[5]?.[0] ?? '');
+    expect(sqlAviso).toContain('INSERT INTO notificacion');
+  });
+
+  it('no genera aviso en otros destinos', async () => {
+    ejecutar
+      .mockResolvedValueOnce([[filaPagado], []])
+      .mockResolvedValueOnce([[{ valida: 1 }], []])
+      .mockResolvedValueOnce([
+        [
+          { id: 2, nombre: 'Pagado' },
+          { id: 3, nombre: 'En preparación' },
+        ],
+        [],
+      ])
+      .mockResolvedValueOnce([{ affectedRows: 1 }, []])
+      .mockResolvedValueOnce([{ insertId: 9 }, []]);
+
+    await avanzarEstado(4, cocinero, 'En preparación');
+
+    const consultas = ejecutar.mock.calls.map((llamada) => String(llamada[0] ?? ''));
+    expect(consultas.some((sql) => sql.includes('notificacion'))).toBe(false);
+  });
+
+  it('no genera aviso sin dueño (mostrador anónimo)', async () => {
+    ejecutar
+      .mockResolvedValueOnce([
+        [{ ...filaEnPreparacion, tipo: 'mostrador', usuario_id: null }],
+        [],
+      ])
+      .mockResolvedValueOnce([[{ valida: 1 }], []])
+      .mockResolvedValueOnce([
+        [
+          { id: 3, nombre: 'En preparación' },
+          { id: 4, nombre: 'Listo' },
+        ],
+        [],
+      ])
+      .mockResolvedValueOnce([{ affectedRows: 1 }, []])
+      .mockResolvedValueOnce([{ insertId: 9 }, []]);
+
+    await avanzarEstado(4, cocinero, 'Listo');
+
+    expect(ejecutar).toHaveBeenCalledTimes(5);
+  });
+});

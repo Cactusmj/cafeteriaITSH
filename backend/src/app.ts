@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express, { type Express } from 'express';
 import { authRoutes } from './routes/auth.routes.js';
+import { avisosRoutes, misPedidosRoutes } from './routes/avisos.routes.js';
 import { cajaRoutes } from './routes/caja.routes.js';
 import { cocinaRoutes } from './routes/cocina.routes.js';
 import { menuAdminRoutes, menuPublicoRoutes } from './routes/menu.routes.js';
@@ -30,6 +31,8 @@ export function crearApp(): Express {
   app.use('/api/pedidos', mostradorRoutes);
   app.use('/api/cocina', cocinaRoutes);
   app.use('/api/caja', cajaRoutes);
+  app.use('/api/mis-pedidos', misPedidosRoutes);
+  app.use('/api/avisos', avisosRoutes);
 
   app.use((_req, res) => {
     res.status(404).json({ error: { codigo: 'NO_ENCONTRADO', mensaje: 'Ruta no encontrada' } });
