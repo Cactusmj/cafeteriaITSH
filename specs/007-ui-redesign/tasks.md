@@ -38,8 +38,8 @@ implementación y prueba independientes.
 
 **Purpose**: Dependencias de fuentes y tokens del sistema de diseño.
 
-- [ ] T001 Instalar en `frontend/` las dependencias `@fontsource/plus-jakarta-sans` y `@fontsource/inter` (únicas dependencias nuevas; research R2) y registrarlas en `frontend/src/main.tsx` con subconjunto latin
-- [ ] T002 Crear el bloque `@theme` en `frontend/src/index.css` con los tokens de `design/DESIGN.md` (superficies, `primary`, `secondary`, `tertiary`, `error`, `status-*`, `on-*`, radios, espaciado) y aplicar fondo crema + texto principal al `body` (research R1, FR-001, FR-003)
+- [x]  Instalar en `frontend/` las dependencias `@fontsource/plus-jakarta-sans` y `@fontsource/inter` (únicas dependencias nuevas; research R2) y registrarlas en `frontend/src/main.tsx` con subconjunto latin
+- [x]  Crear el bloque `@theme` en `frontend/src/index.css` con los tokens de `design/DESIGN.md` (superficies, `primary`, `secondary`, `tertiary`, `error`, `status-*`, `on-*`, radios, espaciado) y aplicar fondo crema + texto principal al `body` (research R1, FR-001, FR-003)
 
 ---
 
@@ -49,10 +49,10 @@ implementación y prueba independientes.
 
 **⚠️ CRITICAL**: Ninguna historia puede empezar hasta terminar esta fase
 
-- [ ] T003 [P] Crear `frontend/src/components/ui/Boton.tsx` (variantes primario/secundario, 44–48 px, deshabilitado legible) + test en `frontend/src/components/ui/Boton.test.tsx` (variantes y deshabilitado)
-- [ ] T004 [P] Crear `frontend/src/components/ui/Tarjeta.tsx` (fondo blanco, borde `outline-variant`, sombra sutil, radios 12–16 px) + test en `frontend/src/components/ui/Tarjeta.test.tsx`
-- [ ] T005 [P] Crear `frontend/src/components/ui/Campo.tsx` (etiqueta visible arriba, foco verde 2 px, error inline en color error) + test en `frontend/src/components/ui/Campo.test.tsx` (etiqueta y mensaje de error)
-- [ ] T006 [P] Crear `frontend/src/components/ui/InsigniaEspecial.tsx` (pill espresso para Especial) y `frontend/src/components/ui/EstadoVacio.tsx` (carga/vacío/error con `Reintentar`) + tests en `frontend/src/components/ui/EstadoVacio.test.tsx`
+- [x]  [P] Crear `frontend/src/components/ui/Boton.tsx` (variantes primario/secundario, 44–48 px, deshabilitado legible) + test en `frontend/src/components/ui/Boton.test.tsx` (variantes y deshabilitado)
+- [x]  [P] Crear `frontend/src/components/ui/Tarjeta.tsx` (fondo blanco, borde `outline-variant`, sombra sutil, radios 12–16 px) + test en `frontend/src/components/ui/Tarjeta.test.tsx`
+- [x]  [P] Crear `frontend/src/components/ui/Campo.tsx` (etiqueta visible arriba, foco verde 2 px, error inline en color error) + test en `frontend/src/components/ui/Campo.test.tsx` (etiqueta y mensaje de error)
+- [x]  [P] Crear `frontend/src/components/ui/InsigniaEspecial.tsx` (pill espresso para Especial) y `frontend/src/components/ui/EstadoVacio.tsx` (carga/vacío/error con `Reintentar`) + tests en `frontend/src/components/ui/EstadoVacio.test.tsx`
 
 **Checkpoint**: Fundación lista — las historias pueden comenzar
 
@@ -70,12 +70,12 @@ acción principal verde, Jakarta/Inter e insignias con colores definidos.
 
 > Escribir primero y confirmar que fallan antes de implementar
 
-- [ ] T007 [P] [US1] Tests de identidad en `frontend/src/pages/clientes/Login.test.tsx` (fondo crema, botón primario verde, tipografías aplicadas)
+- [x]  [P] [US1] Tests de identidad en `frontend/src/pages/clientes/Login.test.tsx` (fondo crema, botón primario verde, tipografías aplicadas)
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Migrar `frontend/src/pages/clientes/Login.tsx` y `frontend/src/pages/clientes/Registro.tsx` de `slate-*` a tokens + componentes `ui/` (misma estructura; FR-001 a FR-005)
-- [ ] T009 [US1] Migrar el encabezado y contenido de `frontend/src/components/layout/LayoutPorRol.tsx` a tokens manteniendo los tabs actuales (la navegación nueva es US2; FR-001, FR-003)
+- [x]  [US1] Migrar `frontend/src/pages/clientes/Login.tsx` y `frontend/src/pages/clientes/Registro.tsx` de `slate-*` a tokens + componentes `ui/` (misma estructura; FR-001 a FR-005)
+- [x]  [US1] Migrar el encabezado y contenido de `frontend/src/components/layout/LayoutPorRol.tsx` a tokens manteniendo los tabs actuales (la navegación nueva es US2; FR-001, FR-003)
 
 **Checkpoint**: US1 funcional y probable de forma independiente
 
@@ -93,12 +93,12 @@ verificar contadores y confirmar que las rutas ajenas siguen denegadas.
 
 > Escribir primero y confirmar que fallan antes de implementar
 
-- [ ] T010 [P] [US2] Ampliar `frontend/src/routes/rutas.test.tsx` (drawer por rol, rutas nuevas `/admin` y `/caja/entregas`, guardas intactas, aviso de listo en navegación del cliente)
+- [x]  [P] [US2] Ampliar `frontend/src/routes/rutas.test.tsx` (drawer por rol, rutas nuevas `/admin` y `/caja/entregas`, guardas intactas, aviso de listo en navegación del cliente)
 
 ### Implementation for User Story 2
 
-- [ ] T011 [US2] Reescribir `frontend/src/components/layout/LayoutPorRol.tsx` con drawer (overlay móvil, fijo 16rem en escritorio, perfil, Cerrar sesión) + bottom bar móvil por rol (cliente: Menú/Mis pedidos; caja: Caja/Entregas ≥ 56 px) + sondeo de `GET /api/avisos` para el aviso de listo del cliente (contrato `contracts/navegacion-ui.md`; FR-006)
-- [ ] T012 [US2] Agregar rutas `/admin` (`frontend/src/pages/admin/InicioAdmin.tsx`, placeholder que US6 completa) y `/caja/entregas` (`frontend/src/pages/caja/Entregas.tsx`, placeholder que US4 completa) en `frontend/src/routes/AppRouter.tsx` dentro de sus grupos `RutaPorRol`, y actualizar `INICIO_POR_ROL` en `frontend/src/lib/sesion.ts` (admin → `/admin`) (FR-011, FR-013)
+- [x]  [US2] Reescribir `frontend/src/components/layout/LayoutPorRol.tsx` con drawer (overlay móvil, fijo 16rem en escritorio, perfil, Cerrar sesión) + bottom bar móvil por rol (cliente: Menú/Mis pedidos; caja: Caja/Entregas ≥ 56 px) + sondeo de `GET /api/avisos` para el aviso de listo del cliente (contrato `contracts/navegacion-ui.md`; FR-006)
+- [x]  [US2] Agregar rutas `/admin` (`frontend/src/pages/admin/InicioAdmin.tsx`, placeholder que US6 completa) y `/caja/entregas` (`frontend/src/pages/caja/Entregas.tsx`, placeholder que US4 completa) en `frontend/src/routes/AppRouter.tsx` dentro de sus grupos `RutaPorRol`, y actualizar `INICIO_POR_ROL` en `frontend/src/lib/sesion.ts` (admin → `/admin`) (FR-011, FR-013)
 
 **Checkpoint**: US1 y US2 funcionan de forma independiente — base navegable con identidad
 
