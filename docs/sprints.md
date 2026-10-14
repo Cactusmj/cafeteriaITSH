@@ -23,9 +23,9 @@ sprint es un subconjunto trazable de ella (historias, FRs y criterios).
 | Sprint | Semanas (est.) | Feature speckit | Historias de 001 | Demo del sprint | Estado |
 |---|---|---|---|---|---|
 | 1 | 1–2 (2026-10-13 → 10-26) | `specs/002-foundation-auth/` | US1 + US8 | Login por rol y rutas protegidas | Completado (2026-10-13) |
-| 2 | 3–4 (2026-10-27 → 11-09) | `specs/003-menu-management/` | US2 + US3 | Admin publica el menú; alumno lo consulta en el móvil | Implementado y validado (2026-10-13); demo agendada 2026-10-14 |
-| 3 | 5–6 (2026-11-10 → 11-23) | `specs/004-advance-orders-payment/` | US4 | Flujo alumno: menú → pedido → pago anticipado | |
-| 4 | 7–8 (2026-11-24 → 12-07) | `specs/005-counter-kitchen/` | US5 + US6 | Cajero captura mostrador; cocina procesa en pantalla | |
+| 2 | 3–4 (2026-10-27 → 11-09) | `specs/003-menu-management/` | US2 + US3 | Admin publica el menú; alumno lo consulta en el móvil | Completado (2026-10-14) |
+| 3 | 5–6 (2026-11-10 → 11-23) | `specs/004-advance-orders-payment/` | US4 | Flujo alumno: menú → pedido → pago anticipado | Completado (2026-10-14) |
+| 4 | 7–8 (2026-11-24 → 12-07) | `specs/005-counter-kitchen/` | US5 + US6 | Cajero captura mostrador; cocina procesa en pantalla | Completado (2026-10-14) |
 | 5 | 9–10 (2026-12-08 → 12-21) | `specs/006-order-tracking-notifications/` | US7 + pulido | Notificación de pedido listo + demo completa | |
 
 > Las fechas son estimadas; se ajustan al calendario real del plantel.
@@ -94,12 +94,10 @@ consultan.
 - Los cambios de precio/disponibilidad se reflejan de inmediato en `/menu`.
 - El menú se consulta sin esperas perceptibles en horario de receso (móvil).
 
-**Estado**: implementado y validado — tareas T001–T022 completadas, 52 pruebas
-de backend y 3 de frontend en verde, lint y typecheck en verde, y validación
+**Estado**: completado — tareas T001–T022 completadas, 52 pruebas
+de backend y 3 de frontend en verde, lint y typecheck en verde, validación
 del `quickstart.md` ejecutada (20/20 comprobaciones de API en verde,
-2026-10-13). **Pendiente**: demo con la patrocinadora — **agendada para el
-2026-10-14** (fecha tentativa); al aprobarla se marca este sprint como
-completado.
+2026-10-13) y demo aprobada por la patrocinadora el 2026-10-14.
 
 ---
 
@@ -127,6 +125,11 @@ los estados de pedido.
 - Un pedido sin pago confirmado no pasa a `Pagado`.
 - El pedido registrado se envía a cocina en estado `Pagado`.
 
+**Estado**: completado — tareas T001–T018 completadas, 80 pruebas de backend
+y 5 de frontend en verde, lint y typecheck en verde, validación del
+`quickstart.md` ejecutada contra MySQL real y demo aprobada por la
+patrocinadora el 2026-10-14.
+
 ---
 
 ## Sprint 4 — Mostrador (cajero) y cocina
@@ -153,6 +156,11 @@ todos los estados operativos.
 - Cocina ve ambos orígenes en una sola pantalla, ordenados por llegada.
 - Transiciones inválidas (saltos de estado, cambiar Entregado/Cancelado) se
   rechazan.
+
+**Estado**: completado — tareas T001–T021 completadas, 112 pruebas de backend
+y 8 de frontend en verde, lint y typecheck en verde, validación de API del
+`quickstart.md` ejecutada contra MySQL real (escenarios de interfaz validados
+en la demo) y demo aprobada por la patrocinadora el 2026-10-14.
 
 ---
 
