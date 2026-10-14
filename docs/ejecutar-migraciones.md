@@ -39,22 +39,23 @@ Se otorgan los permisos sobre `cafeteria_itsh.*` aunque la base todavía no exis
 
 **Importante:** ejecutar `001`, luego `002`, `003` y por último `004`. El `001` crea la base de datos y las tablas; el `002` inserta los datos base (roles, estados, transiciones, platillos y menú de ejemplo); el `003` agrega la columna `clave_idempotencia` de `pedido` (sprint 3, evita pedidos duplicados); el `004` amplía el catálogo de canal y lectura de `notificacion` (sprint 5, avisos en-app).
 
-Desde CMD, redirigiendo la entrada del archivo con `<`:
+Desde CMD, redirigiendo la entrada del archivo con `<` (siempre con
+`--default-character-set=utf8mb4` para no corromper los acentos del catálogo):
 
 ```cmd
-mysql -u cafe_admin -p < migrations\001_crear_esquema_mysql.sql
-mysql -u cafe_admin -p < migrations\002_seed_inicial_mysql.sql
-mysql -u cafe_admin -p < migrations\003_clave_idempotencia_pedido.sql
-mysql -u cafe_admin -p < migrations\004_avisos_app.sql
+mysql --default-character-set=utf8mb4 -u cafe_admin -p < migrations\001_crear_esquema_mysql.sql
+mysql --default-character-set=utf8mb4 -u cafe_admin -p < migrations\002_seed_inicial_mysql.sql
+mysql --default-character-set=utf8mb4 -u cafe_admin -p < migrations\003_clave_idempotencia_pedido.sql
+mysql --default-character-set=utf8mb4 -u cafe_admin -p < migrations\004_avisos_app.sql
 ```
 
 Desde PowerShell 5.1 (que no admite el operador `<`), invoca CMD con `cmd /c`:
 
 ```powershell
-cmd /c "mysql -u cafe_admin -p < migrations\001_crear_esquema_mysql.sql"
-cmd /c "mysql -u cafe_admin -p < migrations\002_seed_inicial_mysql.sql"
-cmd /c "mysql -u cafe_admin -p < migrations\003_clave_idempotencia_pedido.sql"
-cmd /c "mysql -u cafe_admin -p < migrations\004_avisos_app.sql"
+cmd /c "mysql --default-character-set=utf8mb4 -u cafe_admin -p < migrations\001_crear_esquema_mysql.sql"
+cmd /c "mysql --default-character-set=utf8mb4 -u cafe_admin -p < migrations\002_seed_inicial_mysql.sql"
+cmd /c "mysql --default-character-set=utf8mb4 -u cafe_admin -p < migrations\003_clave_idempotencia_pedido.sql"
+cmd /c "mysql --default-character-set=utf8mb4 -u cafe_admin -p < migrations\004_avisos_app.sql"
 ```
 
 > No uses `mysql -e "source archivo.sql"`: en MySQL 9.6 el comando `source` solo funciona dentro de la sesión interactiva, no con `-e`.
