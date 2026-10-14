@@ -112,13 +112,13 @@ verificar contadores y confirmar que las rutas ajenas siguen denegadas.
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T013 [P] [US3] Tests de `frontend/src/components/menu/TarjetaPlatillo.tsx` en `frontend/src/components/menu/TarjetaPlatillo.test.tsx` (stepper 44 px, Especial espresso, no disponible atenuado)
+- [x]  [P] [US3] Tests de `frontend/src/components/menu/TarjetaPlatillo.tsx` en `frontend/src/components/menu/TarjetaPlatillo.test.tsx` (stepper 44 px, Especial espresso, no disponible atenuado)
 
 ### Implementation for User Story 3
 
-- [ ] T014 [US3] Rediseñar `frontend/src/pages/clientes/Menu.tsx` (buscador en vivo, chips por categorías del catálogo, barra flotante con total) + migrar `frontend/src/components/menu/TarjetaPlatillo.tsx` a tokens (FR-004, FR-007)
-- [ ] T015 [US3] Rediseñar `frontend/src/pages/clientes/ConfirmarPedido.tsx` (desglose, total grande, regla de 10 min inline con hora mínima, leyenda de no captura de tarjeta) con componentes `ui/` (FR-008, FR-009)
-- [ ] T016 [US3] Rediseñar `frontend/src/pages/clientes/MisPedidos.tsx` (encabezado con conteo de activos, tarjeta con borde `status-ready` para Listo, CTA Nuevo pedido, estados vacío/error con `Reintentar`) reutilizando `BadgeEstado` (FR-010, FR-014)
+- [x]  [US3] Rediseñar `frontend/src/pages/clientes/Menu.tsx` (buscador en vivo, chips por categorías del catálogo, barra flotante con total) + migrar `frontend/src/components/menu/TarjetaPlatillo.tsx` a tokens (FR-004, FR-007)
+- [x]  [US3] Rediseñar `frontend/src/pages/clientes/ConfirmarPedido.tsx` (desglose, total grande, regla de 10 min inline con hora mínima, leyenda de no captura de tarjeta) con componentes `ui/` (FR-008, FR-009)
+- [x]  [US3] Rediseñar `frontend/src/pages/clientes/MisPedidos.tsx` (encabezado con conteo de activos, tarjeta con borde `status-ready` para Listo, CTA Nuevo pedido, estados vacío/error con `Reintentar`) reutilizando `BadgeEstado` (FR-010, FR-014)
 
 **Checkpoint**: US3 funcional de forma independiente
 
