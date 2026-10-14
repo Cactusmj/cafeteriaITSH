@@ -1,5 +1,48 @@
 @import "tailwindcss";
 
+/** Tokens del sistema de diseño canónico (design/DESIGN.md). */
+@theme {
+  --color-surface: #f6f1e9;
+  --color-surface-dim: #e4ddd2;
+  --color-surface-bright: #fbf8f3;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fbf8f3;
+  --color-surface-container: #f1ece3;
+  --color-surface-container-high: #eae4da;
+  --color-surface-container-highest: #e4ddd2;
+  --color-on-surface: #1c1917;
+  --color-on-surface-variant: #44403c;
+  --color-outline: #78716c;
+  --color-outline-variant: #d6d0c5;
+  --color-primary: #1e7a46;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #ccebd9;
+  --color-on-primary-container: #0b3d22;
+  --color-secondary: #8a6a4f;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #f3e7da;
+  --color-on-secondary-container: #3d2a17;
+  --color-tertiary: #6b3f23;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #f2e1d0;
+  --color-on-tertiary-container: #2c1608;
+  --color-error: #b91c1c;
+  --color-on-error: #ffffff;
+  --color-error-container: #fee2e2;
+  --color-on-error-container: #7f1d1d;
+  --color-background: #f6f1e9;
+  --color-on-background: #1c1917;
+  --color-status-pending: #9a3412;
+  --color-status-paid: #1e7a46;
+  --color-status-preparing: #b45309;
+  --color-status-ready: #0369a1;
+  --color-status-delivered: #166534;
+  --color-status-cancelled: #b91c1c;
+
+  --font-heading: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
 html,
 body,
 #root {
@@ -8,7 +51,7 @@ body,
 
 body {
   margin: 0;
-  background-color: #f8fafc;
-  color: #0f172a;
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  font-family: var(--font-sans);
 }
