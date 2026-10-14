@@ -26,7 +26,7 @@ sprint es un subconjunto trazable de ella (historias, FRs y criterios).
 | 2 | 3–4 (2026-10-27 → 11-09) | `specs/003-menu-management/` | US2 + US3 | Admin publica el menú; alumno lo consulta en el móvil | Completado (2026-10-14) |
 | 3 | 5–6 (2026-11-10 → 11-23) | `specs/004-advance-orders-payment/` | US4 | Flujo alumno: menú → pedido → pago anticipado | Completado (2026-10-14) |
 | 4 | 7–8 (2026-11-24 → 12-07) | `specs/005-counter-kitchen/` | US5 + US6 | Cajero captura mostrador; cocina procesa en pantalla | Completado (2026-10-14) |
-| 5 | 9–10 (2026-12-08 → 12-21) | `specs/006-order-tracking-notifications/` | US7 + pulido | Notificación de pedido listo + demo completa | |
+| 5 | 9–10 (2026-12-08 → 12-21) | `specs/006-order-tracking-notifications/` | US7 + pulido | Notificación de pedido listo + demo completa | Completado (2026-10-14) |
 
 > Las fechas son estimadas; se ajustan al calendario real del plantel.
 >
@@ -186,6 +186,11 @@ puntos de lealtad).
 - Flujo completo demostrable: menú → selección → pedido → pago → cocina →
   preparación → listo → notificación → recogida.
 - Pruebas de estados, pagos y permisos en verde (Vitest).
+
+**Estado**: completado — tareas T001–T016 completadas, 128 pruebas de backend
+y 10 de frontend en verde, lint y typecheck en verde, validación del
+`quickstart.md` ejecutada contra MySQL real (33/33 comprobaciones en verde,
+2026-10-14) y demo aprobada por la patrocinadora el 2026-10-14.
 
 ---
 
