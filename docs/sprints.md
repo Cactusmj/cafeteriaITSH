@@ -167,7 +167,7 @@ de listo; cierre del MVP con pruebas y demo final.
 - Frontend clientes (`/mis-pedidos`): lista de pedidos con estado y detalle.
 - Notificación de pedido listo (módulo separado de la lógica de pedidos; en-app
   como mínimo, servicio externo si está disponible).
-- Pulido de UI según DESIGN.md, pruebas críticas pendientes (pagos, estados,
+- Pulido de UI según `design/DESIGN.md`, pruebas críticas pendientes (pagos, estados,
   permisos), preparación de la demo final ante la patrocinadora.
 
 **No entra**: funcionalidades fuera del alcance del MVP (reseñas, inventario,

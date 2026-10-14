@@ -19,7 +19,7 @@
   - `/menu` y `/mis-pedidos` — clientes (alumno/docente)
 - Rutas protegidas por JWT y rol: cada ruta exige sesión activa y el rol correspondiente.
 - Framework de diseño del frontend: **Tailwind CSS + shadcn/ui** (componentes copiados al proyecto y personalizados con los tokens del proyecto).
-- Los diseños de Stitch (`.stitch/DESIGN.md`) son una base de referencia; no se replican al 100 % y podrán modificarse durante el desarrollo.
+- Los diseños de `design/DESIGN.md` son una base de referencia; no se replican al 100 % y podrán modificarse durante el desarrollo.
 - Un backend único (Node.js LTS + Express, API REST) atiende a todos los roles.
 
 ## Features principales

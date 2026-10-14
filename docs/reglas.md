@@ -24,7 +24,7 @@ Este proyecto es un sistema web de pedidos anticipados para la cafetería del In
   - `/mis-pedidos` — seguimiento de pedidos de clientes (alumno/docente).
 - Las rutas deben estar **protegidas por JWT y rol**: cada una exige sesión activa y el rol correspondiente; un usuario sin el rol no puede acceder.
 - Utilizar **Tailwind CSS + shadcn/ui** como framework de diseño: los componentes de shadcn se copian al proyecto y se personalizan con los tokens del proyecto.
-- Los tokens de diseño de `.stitch/DESIGN.md` (colores, tipografía, espaciado) son una **base de referencia** para la interfaz; los diseños de Stitch **no son obligatorios al 100 %** y podrán modificarse durante el desarrollo.
+- Los tokens de diseño de `design/DESIGN.md` (colores, tipografía, espaciado) son una **base de referencia** para la interfaz; los diseños **no son obligatorios al 100 %** y podrán modificarse durante el desarrollo.
 - La interfaz debe ser responsiva y funcionar correctamente en dispositivos móviles y computadoras.
 - Las interfaces deben ser simples, claras y rápidas.
 - Las pantallas utilizadas por cajeros y cocineros deben priorizar la rapidez y facilidad de uso durante los horarios de receso.

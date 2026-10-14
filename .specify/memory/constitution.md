@@ -70,7 +70,7 @@ los flujos de mayor riesgo (pagos, estados y control por rol).
 ## Restricciones y Requisitos Técnicos
 
 - **Stack**: TypeScript; Node.js LTS + Express; React + TypeScript con Vite;
-  Tailwind CSS + shadcn/ui; MySQL. Los diseños de `.stitch/DESIGN.md` son
+  Tailwind CSS + shadcn/ui; MySQL. Los diseños de `design/DESIGN.md` son
   referencia y podrán modificarse durante el desarrollo.
 - **API REST**: todas las operaciones frontend/backend MUST usar una API REST con
   los métodos HTTP según su propósito (`GET`, `POST`, `PUT`/`PATCH`, `DELETE`) y
@@ -148,4 +148,4 @@ los flujos de mayor riesgo (pagos, estados y control por rol).
   rechazarse. Las desviaciones deben justificarse y, cuando corresponda,
   aprobarse previamente.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-11 | **Last Amended**: 2026-10-11
+**Version**: 1.0.1 | **Ratified**: 2026-10-11 | **Last Amended**: 2026-10-14
