@@ -9,6 +9,9 @@ export const env = {
   port: Number(process.env.PORT ?? 3000),
   jwtSecret: process.env.JWT_SECRET ?? 'secreto-de-desarrollo-cambiar',
   expiracionToken: process.env.JWT_EXPIRATION ?? '8h',
+  paymentProvider: process.env.PAYMENT_PROVIDER ?? 'sandbox',
+  paymentApiKey: process.env.PAYMENT_API_KEY ?? '',
+  paymentSandboxModo: process.env.PAYMENT_SANDBOX_MODO ?? 'exito',
   db: {
     host: process.env.DB_HOST ?? '127.0.0.1',
     port: Number(process.env.DB_PORT ?? 3306),
