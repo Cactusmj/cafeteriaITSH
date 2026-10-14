@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { BadgeEstado } from '../../components/pedidos/BadgeEstado'
+import { Boton } from '../../components/ui/Boton'
+import { EstadoVacio } from '../../components/ui/EstadoVacio'
+import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
 import { useSesion } from '../../lib/useSesion'
 
@@ -41,12 +45,12 @@ interface Aviso {
   fecha: string
 }
 
-const claseBoton =
-  'inline-flex min-h-11 items-center justify-center rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60'
+const ESTADOS_ACTIVOS = ['Pendiente', 'Pagado', 'En preparación', 'Listo']
 
 /** Seguimiento de pedidos y avisos de listo del cliente. */
 export function MisPedidos() {
   const { token } = useSesion()
+  const navegar = useNavigate()
   const [pedidos, setPedidos] = useState<PedidoPropio[]>([])
   const [avisos, setAvisos] = useState<Aviso[]>([])
   const [detalle, setDetalle] = useState<DetallePedido | null>(null)
@@ -73,6 +77,11 @@ export function MisPedidos() {
   useEffect(() => {
     void Promise.resolve().then(cargar)
   }, [cargar])
+
+  function refrescar() {
+    setCargando(true)
+    void cargar()
+  }
 
   const verDetalle = useCallback(
     async (id: number) => {
@@ -101,76 +110,96 @@ export function MisPedidos() {
   }, [token, cargar])
 
   const pendientes = avisos.filter((aviso) => aviso.estado_envio === 'enviada')
+  const activos = pedidos.filter((pedido) => ESTADOS_ACTIVOS.includes(pedido.estado)).length
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold text-slate-900">Mis pedidos</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-heading text-2xl font-bold text-on-surface">Mis pedidos</h1>
+        {pedidos.length > 0 && (
+          <span className="rounded-full bg-surface-container px-3 py-1 text-xs font-semibold text-on-surface-variant">
+            {activos === 0 ? 'Sin pedidos activos' : `${activos} ${activos === 1 ? 'activo' : 'activos'}`}
+          </span>
+        )}
+      </div>
 
       {error && (
-        <p role="alert" className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error}
-        </p>
+        <EstadoVacio titulo="No se pudieron cargar tus pedidos" descripcion={error} onReintentar={refrescar} />
       )}
 
       {pendientes.length > 0 && (
-        <div className="rounded border-2 border-slate-900 bg-white p-4">
-          <p className="text-base font-semibold text-slate-900">
-            Tienes {pendientes.length === 1 ? 'un pedido listo' : `${pendientes.length} pedidos listos`} para recoger
+        <div className="rounded-xl border-2 border-status-ready bg-surface-container-lowest p-4 shadow-sm">
+          <p className="font-heading text-base font-bold text-on-surface">
+            ¡Listo para recoger! Tienes{' '}
+            {pendientes.length === 1 ? 'un pedido listo' : `${pendientes.length} pedidos listos`}
           </p>
           <ul className="mt-2 flex flex-col gap-1">
             {pendientes.map((aviso) => (
-              <li key={aviso.id} className="text-sm text-slate-700">
+              <li key={aviso.id} className="text-sm text-on-surface">
                 Folio <span className="font-semibold">{aviso.numero}</span> — listo para recoger
               </li>
             ))}
           </ul>
-          <button type="button" onClick={() => void marcarVistos()} disabled={marcando} className={`${claseBoton} mt-3`}>
+          <Boton onClick={() => void marcarVistos()} disabled={marcando} className="mt-3">
             {marcando ? 'Marcando…' : 'Marcar como vistos'}
-          </button>
+          </Boton>
         </div>
       )}
 
       {cargando ? (
-        <p className="text-slate-600">Cargando tus pedidos…</p>
+        <p className="text-on-surface-variant">Cargando tus pedidos…</p>
       ) : pedidos.length === 0 ? (
-        <p className="rounded border border-slate-200 bg-white px-4 py-6 text-center text-slate-600">
-          Aún no tienes pedidos. Explora el menú del día para hacer el primero.
-        </p>
+        <>
+          <EstadoVacio
+            titulo="Aún no tienes pedidos"
+            descripcion="Explora el menú del día para hacer el primero."
+          />
+          <div>
+            <Boton onClick={() => navegar('/menu')}>Nuevo pedido</Boton>
+          </div>
+        </>
       ) : (
-        <ul className="flex flex-col gap-2">
-          {pedidos.map((pedido) => (
-            <li key={pedido.id} className="rounded border border-slate-200 bg-white px-4 py-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <p className="text-base font-bold text-slate-900">{pedido.numero}</p>
-                  <p className="text-xs text-slate-600">
-                    {pedido.lineas} líneas · ${pedido.total}
-                    {pedido.fecha_recoleccion ? ` · recoge ${pedido.fecha_recoleccion.replace('T', ' ')}` : ''}
-                  </p>
-                </div>
-                <BadgeEstado estado={pedido.estado} />
-              </div>
-              <button
-                type="button"
-                onClick={() => void verDetalle(pedido.id)}
-                className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-slate-700 underline"
-              >
-                Ver detalle
-              </button>
-              {detalle?.id === pedido.id && (
-                <ul className="mt-2 flex flex-col gap-1 border-t border-slate-200 pt-2">
-                  {detalle.detalle.map((linea) => (
-                    <li key={linea.menu_dia_id} className="flex justify-between gap-2 text-sm text-slate-700">
-                      <span>
-                        {linea.cantidad} × {linea.platillo}
-                      </span>
-                      <span className="font-medium">${linea.subtotal}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
+        <ul className="flex flex-col gap-3">
+          {pedidos.map((pedido) => {
+            const listo = pedido.estado === 'Listo'
+            return (
+              <li key={pedido.id}>
+                <Tarjeta
+                  className={`p-4 ${listo ? 'border-2 border-status-ready' : ''}`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <p className="font-heading text-base font-bold text-on-surface">{pedido.numero}</p>
+                      <p className="text-xs text-on-surface-variant">
+                        {pedido.lineas} líneas · ${pedido.total}
+                        {pedido.fecha_recoleccion ? ` · recoge ${pedido.fecha_recoleccion.replace('T', ' ')}` : ''}
+                      </p>
+                    </div>
+                    <BadgeEstado estado={pedido.estado} />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void verDetalle(pedido.id)}
+                    className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-primary underline"
+                  >
+                    Ver detalle
+                  </button>
+                  {detalle?.id === pedido.id && (
+                    <ul className="mt-2 flex flex-col gap-1 border-t border-outline-variant pt-2">
+                      {detalle.detalle.map((linea) => (
+                        <li key={linea.menu_dia_id} className="flex justify-between gap-2 text-sm text-on-surface">
+                          <span>
+                            {linea.cantidad} × {linea.platillo}
+                          </span>
+                          <span className="font-medium">${linea.subtotal}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Tarjeta>
+              </li>
+            )
+          })}
         </ul>
       )}
     </section>

@@ -1,3 +1,4 @@
+import { InsigniaEspecial } from '../ui/InsigniaEspecial'
 import type { Categoria } from '../../lib/categorias'
 import { ETIQUETA_CATEGORIA } from '../../lib/categorias'
 
@@ -14,7 +15,7 @@ interface Props {
 }
 
 const claseBotonCantidad =
-  'inline-flex min-h-11 min-w-11 items-center justify-center rounded border border-slate-300 bg-white px-3 text-base font-semibold text-slate-900 hover:bg-slate-100'
+  'inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-outline bg-surface-container-lowest px-3 text-base font-semibold text-on-surface hover:bg-surface-container'
 
 /** Tarjeta de un platillo del menú para la consulta de clientes. */
 export function TarjetaPlatillo({
@@ -34,31 +35,27 @@ export function TarjetaPlatillo({
 
   return (
     <article
-      className={`flex flex-col gap-2 rounded border bg-white p-4 ${
-        disponible ? 'border-slate-200' : 'border-slate-200 opacity-70'
+      className={`flex flex-col gap-2 rounded-xl border border-outline-variant bg-surface-container-lowest p-4 shadow-sm ${
+        disponible ? '' : 'opacity-70'
       }`}
     >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-base font-semibold text-slate-900">{platillo}</h3>
-        <span className="whitespace-nowrap text-base font-semibold text-slate-900">${precio}</span>
+        <h3 className="text-base font-semibold text-on-surface">{platillo}</h3>
+        <span className="whitespace-nowrap font-heading text-base font-bold text-on-surface">${precio}</span>
       </div>
 
       {etiquetaCategoria && (
-        <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        <span className="text-xs font-medium uppercase tracking-wide text-on-surface-variant">
           {etiquetaCategoria}
         </span>
       )}
 
-      {descripcion && <p className="text-sm text-slate-600">{descripcion}</p>}
+      {descripcion && <p className="text-sm text-on-surface-variant">{descripcion}</p>}
 
       <div className="mt-auto flex flex-wrap gap-2 pt-1">
-        {especial && (
-          <span className="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">
-            Especial del día
-          </span>
-        )}
+        {especial && <InsigniaEspecial />}
         {!disponible && (
-          <span className="rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
+          <span className="inline-flex min-h-11 items-center rounded-full bg-surface-container px-3 py-1 text-xs font-medium text-on-surface-variant">
             No disponible
           </span>
         )}
@@ -77,7 +74,7 @@ export function TarjetaPlatillo({
             </button>
           )}
           {cantidad > 0 && (
-            <span aria-label={`Cantidad de ${platillo}`} className="min-w-6 text-center text-base font-semibold text-slate-900">
+            <span aria-label={`Cantidad de ${platillo}`} className="min-w-6 text-center font-heading text-base font-bold text-on-surface">
               {cantidad}
             </span>
           )}
@@ -86,7 +83,7 @@ export function TarjetaPlatillo({
             onClick={onAgregar}
             disabled={!disponible}
             aria-label={`Agregar ${platillo} al carrito`}
-            className="inline-flex min-h-11 items-center justify-center rounded bg-slate-900 px-4 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-on-primary hover:brightness-110 disabled:opacity-60"
           >
             Agregar
           </button>

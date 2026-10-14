@@ -1,6 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { TarjetaPlatillo } from '../../components/menu/TarjetaPlatillo'
+import { Boton } from '../../components/ui/Boton'
+import { Campo } from '../../components/ui/Campo'
+import { EstadoVacio } from '../../components/ui/EstadoVacio'
 import { api, ErrorPeticion } from '../../lib/api'
 import {
   guardarCarrito,
@@ -21,16 +24,23 @@ interface PlatilloMenu {
   especial: boolean
 }
 
-const claseBoton =
-  'inline-flex min-h-11 items-center justify-center rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60'
+const claseChip = (activa: boolean): string =>
+  `inline-flex min-h-11 items-center rounded-full px-4 text-sm font-medium ${
+    activa
+      ? 'bg-primary font-semibold text-on-primary'
+      : 'border border-outline bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container'
+  }`
 
 /** Consulta del menú del día para alumnos y docentes. */
 export function Menu() {
   const { token } = useSesion()
+  const navegar = useNavigate()
   const [platillos, setPlatillos] = useState<PlatilloMenu[]>([])
   const [fecha, setFecha] = useState<string | null>(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [busqueda, setBusqueda] = useState('')
+  const [categoria, setCategoria] = useState<string | null>(null)
   const [carrito, setCarrito] = useState<LineaCarrito[]>(() => leerCarrito())
 
   const cargar = useCallback(async () => {
@@ -98,79 +108,129 @@ export function Menu() {
     [carrito, actualizarCarrito],
   )
 
-  const porCategoria = platillos.reduce<Record<string, PlatilloMenu[]>>((acumulado, platillo) => {
+  const categoriasOrdenadas = useMemo(() => {
+    const claves = new Set<string>()
+    for (const platillo of platillos) {
+      claves.add(platillo.categoria ?? 'sin categoria')
+    }
+    return [...claves].sort((a, b) => a.localeCompare(b, 'es'))
+  }, [platillos])
+
+  const textoBusqueda = busqueda.trim().toLowerCase()
+  const filtrados = platillos.filter((platillo) => {
+    if (categoria && (platillo.categoria ?? 'sin categoria') !== categoria) {
+      return false
+    }
+    if (!textoBusqueda) {
+      return true
+    }
+    return (
+      platillo.platillo.toLowerCase().includes(textoBusqueda) ||
+      (platillo.descripcion ?? '').toLowerCase().includes(textoBusqueda)
+    )
+  })
+
+  const grupos = filtrados.reduce<Record<string, PlatilloMenu[]>>((acumulado, platillo) => {
     const clave = platillo.categoria ?? 'sin categoria'
     ;(acumulado[clave] ??= []).push(platillo)
     return acumulado
   }, {})
 
-  const categoriasOrdenadas = Object.keys(porCategoria).sort((a, b) => a.localeCompare(b, 'es'))
+  const unidades = carrito.reduce((total, linea) => total + linea.cantidad, 0)
+
+  const etiquetaCategoria = (clave: string): string =>
+    clave in ETIQUETA_CATEGORIA ? ETIQUETA_CATEGORIA[clave as Categoria] : clave
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Menú del día</h1>
-          {fecha && <p className="text-sm text-slate-600">Fecha: {fecha}</p>}
+          <h1 className="font-heading text-2xl font-bold text-on-surface">Menú del día</h1>
+          {fecha && <p className="text-sm text-on-surface-variant">Fecha: {fecha}</p>}
         </div>
-        <button type="button" onClick={() => void refrescar()} disabled={cargando} className={claseBoton}>
+        <Boton variante="secundario" onClick={() => void refrescar()} disabled={cargando}>
           {cargando ? 'Actualizando…' : 'Actualizar'}
-        </button>
+        </Boton>
       </div>
 
-      {error && (
-        <p role="alert" className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error}
-        </p>
+      <Campo
+        etiqueta="Buscar producto"
+        placeholder="Buscar producto…"
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+      />
+
+      {categoriasOrdenadas.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Filtrar por categoría">
+          <button
+            type="button"
+            aria-pressed={categoria === null}
+            onClick={() => setCategoria(null)}
+            className={claseChip(categoria === null)}
+          >
+            Todos
+          </button>
+          {categoriasOrdenadas.map((clave) => (
+            <button
+              key={clave}
+              type="button"
+              aria-pressed={categoria === clave}
+              onClick={() => setCategoria(clave)}
+              className={claseChip(categoria === clave)}
+            >
+              {etiquetaCategoria(clave)}
+            </button>
+          ))}
+        </div>
       )}
 
       {cargando ? (
-        <p className="text-slate-600">Cargando menú…</p>
+        <p className="text-on-surface-variant">Cargando menú…</p>
+      ) : error && platillos.length === 0 ? (
+        <EstadoVacio titulo="No se pudo cargar el menú" descripcion={error} onReintentar={() => void refrescar()} />
       ) : platillos.length === 0 ? (
-        <p className="rounded border border-slate-200 bg-white px-4 py-6 text-center text-slate-600">
-          No hay menú publicado por hoy. Vuelve más tarde.
-        </p>
+        <EstadoVacio titulo="Menú no disponible hoy" descripcion="No hay menú publicado por hoy. Vuelve más tarde." />
+      ) : filtrados.length === 0 ? (
+        <EstadoVacio
+          titulo={textoBusqueda ? `Sin resultados para ‘${busqueda.trim()}’` : 'Sin resultados en esta categoría'}
+          descripcion="Prueba otra búsqueda o categoría."
+        />
       ) : (
-        categoriasOrdenadas.map((categoria) => (
-          <div key={categoria} className="flex flex-col gap-3">
-            <h2 className="text-lg font-medium text-slate-900">
-              {categoria in ETIQUETA_CATEGORIA
-                ? ETIQUETA_CATEGORIA[categoria as Categoria]
-                : categoria}
-            </h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {porCategoria[categoria].map((platillo) => (
-                <TarjetaPlatillo
-                  key={platillo.id}
-                  platillo={platillo.platillo}
-                  categoria={platillo.categoria}
-                  descripcion={platillo.descripcion}
-                  precio={platillo.precio}
-                  disponible={platillo.disponible}
-                  especial={platillo.especial}
-                  cantidad={carrito.find((linea) => linea.menu_dia_id === platillo.id)?.cantidad ?? 0}
-                  onAgregar={() => agregarAlCarrito(platillo)}
-                  onQuitar={() => quitarDelCarrito(platillo)}
-                />
-              ))}
+        Object.keys(grupos)
+          .sort((a, b) => a.localeCompare(b, 'es'))
+          .map((clave) => (
+            <div key={clave} className="flex flex-col gap-3">
+              <h2 className="font-heading text-lg font-bold text-on-surface">
+                {etiquetaCategoria(clave)}
+              </h2>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {grupos[clave].map((platillo) => (
+                  <TarjetaPlatillo
+                    key={platillo.id}
+                    platillo={platillo.platillo}
+                    categoria={platillo.categoria}
+                    descripcion={platillo.descripcion}
+                    precio={platillo.precio}
+                    disponible={platillo.disponible}
+                    especial={platillo.especial}
+                    cantidad={carrito.find((linea) => linea.menu_dia_id === platillo.id)?.cantidad ?? 0}
+                    onAgregar={() => agregarAlCarrito(platillo)}
+                    onQuitar={() => quitarDelCarrito(platillo)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))
+          ))
       )}
 
-      {carrito.length > 0 && (
-        <div className="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded border border-slate-200 bg-white px-4 py-3 shadow">
-          <p className="text-sm text-slate-700">
-            <span className="font-semibold">{carrito.length}</span>
-            {carrito.length === 1 ? ' platillo en el carrito' : ' platillos en el carrito'} · total{' '}
-            <span className="font-semibold">${totalCarrito(carrito)}</span>
+      {unidades > 0 && (
+        <div className="sticky bottom-20 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 shadow md:bottom-4">
+          <p className="text-sm text-on-surface">
+            <span className="font-heading font-bold">{unidades}</span>{' '}
+            {unidades === 1 ? 'producto' : 'productos'} ·{' '}
+            <span className="font-heading font-bold text-primary">${totalCarrito(carrito)}</span>
           </p>
-          <Link
-            to="/confirmar-pedido"
-            className="inline-flex min-h-11 items-center justify-center rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
-          >
-            Continuar pedido
-          </Link>
+          <Boton onClick={() => navegar('/confirmar-pedido')}>Ver pedido</Boton>
         </div>
       )}
     </section>

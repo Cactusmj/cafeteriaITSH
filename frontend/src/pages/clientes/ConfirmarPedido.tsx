@@ -1,5 +1,9 @@
-import { useCallback, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { BadgeEstado } from '../../components/pedidos/BadgeEstado'
+import { Boton } from '../../components/ui/Boton'
+import { EstadoVacio } from '../../components/ui/EstadoVacio'
+import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
 import {
   leerCarrito,
@@ -13,6 +17,7 @@ import { useSesion } from '../../lib/useSesion'
 
 const CIERRE_CAFETERIA = 17
 const INTERVALO_MINUTOS = 15
+const ANTICIPACION_MINIMA_MINUTOS = 10
 
 interface PagoConfirmacion {
   metodo: string
@@ -72,9 +77,6 @@ function generarSlots(ahora: Date): Slot[] {
   return slots
 }
 
-const claseBoton =
-  'inline-flex min-h-11 items-center justify-center rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60'
-
 /** Confirmación del pedido anticipado y su pago en línea. */
 export function ConfirmarPedido() {
   const { token } = useSesion()
@@ -85,13 +87,33 @@ export function ConfirmarPedido() {
   const [creando, setCreando] = useState(false)
   const [pagando, setPagando] = useState(false)
   const [mensaje, setMensaje] = useState<string | null>(null)
+  const [horaMinima, setHoraMinima] = useState('')
+  const [horarioCorto, setHorarioCorto] = useState(false)
 
   const slots = useMemo(() => generarSlots(new Date()), [])
   const total = totalCarrito(lineas)
 
+  useEffect(() => {
+    void Promise.resolve().then(() => {
+      const minima = new Date(Date.now() + ANTICIPACION_MINIMA_MINUTOS * 60_000)
+      setHoraMinima(`${dosDigitos(minima.getHours())}:${dosDigitos(minima.getMinutes())}`)
+    })
+  }, [])
+
+  function elegirHorario(valor: string) {
+    setHorario(valor)
+    setHorarioCorto(
+      valor !== '' && new Date(valor).getTime() - Date.now() < ANTICIPACION_MINIMA_MINUTOS * 60_000,
+    )
+  }
+
   const crearPedido = useCallback(async () => {
     if (!horario) {
       setMensaje('Elige un horario de recolección para continuar')
+      return
+    }
+    if (new Date(horario).getTime() - Date.now() < ANTICIPACION_MINIMA_MINUTOS * 60_000) {
+      setMensaje(`El pedido debe hacerse con al menos 10 minutos de anticipación${horaMinima ? ` (a partir de las ${horaMinima})` : ''}`)
       return
     }
     setCreando(true)
@@ -112,7 +134,7 @@ export function ConfirmarPedido() {
     } finally {
       setCreando(false)
     }
-  }, [horario, lineas, token])
+  }, [horario, horaMinima, lineas, token])
 
   const pagarPedido = useCallback(async () => {
     if (!pedido) {
@@ -143,14 +165,13 @@ export function ConfirmarPedido() {
   if (!pedido && lineas.length === 0) {
     return (
       <section className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold text-slate-900">Confirmar pedido</h1>
-        <p className="rounded border border-slate-200 bg-white px-4 py-6 text-center text-slate-600">
-          Tu carrito está vacío. Elige platillos del menú para continuar.
-        </p>
+        <h1 className="font-heading text-2xl font-bold text-on-surface">Confirmar pedido</h1>
+        <EstadoVacio
+          titulo="Tu carrito está vacío"
+          descripcion="Elige platillos del menú para continuar."
+        />
         <div>
-          <Link to="/menu" className={`${claseBoton} no-underline`}>
-            Volver al menú
-          </Link>
+          <Boton onClick={() => navegar('/menu')}>Volver al menú</Boton>
         </div>
       </section>
     )
@@ -160,21 +181,22 @@ export function ConfirmarPedido() {
     const pagado = pedido.estado === 'Pagado'
     return (
       <section className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold text-slate-900">
-          {pagado ? 'Pedido confirmado' : 'Pedido creado'}
+        <h1 className="font-heading text-2xl font-bold text-on-surface">
+          {pagado ? 'Confirmación de pedido' : 'Pagar pedido'}
         </h1>
 
-        <div className="rounded border border-slate-200 bg-white p-4">
-          <p className="text-sm text-slate-600">Folio</p>
-          <p className="text-lg font-semibold text-slate-900">{pedido.numero}</p>
-          <dl className="mt-3 grid gap-1 text-sm text-slate-700">
-            <div className="flex justify-between gap-3">
-              <dt>Estado</dt>
-              <dd className="font-medium">{pedido.estado}</dd>
+        <Tarjeta className="p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-sm text-on-surface-variant">Folio</p>
+              <p className="font-mono text-2xl font-bold text-on-surface">{pedido.numero}</p>
             </div>
+            <BadgeEstado estado={pedido.estado} />
+          </div>
+          <dl className="mt-3 grid gap-1 text-sm text-on-surface">
             <div className="flex justify-between gap-3">
               <dt>Total</dt>
-              <dd className="font-medium">${pedido.total}</dd>
+              <dd className="font-heading font-bold">${pedido.total}</dd>
             </div>
             {pedido.fecha_recoleccion && (
               <div className="flex justify-between gap-3">
@@ -182,35 +204,41 @@ export function ConfirmarPedido() {
                 <dd className="font-medium">{pedido.fecha_recoleccion.replace('T', ' ')}</dd>
               </div>
             )}
-            {pedido.pago && (
+            {pedido.pago?.referencia && (
               <div className="flex justify-between gap-3">
                 <dt>Referencia de pago</dt>
                 <dd className="font-medium">{pedido.pago.referencia}</dd>
               </div>
             )}
           </dl>
-        </div>
+        </Tarjeta>
 
         {mensaje && (
-          <p role="alert" className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p role="alert" className="rounded-lg bg-error-container px-3 py-2 text-sm text-on-error-container">
             {mensaje}
           </p>
         )}
 
         {pagado ? (
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-on-surface-variant">
             Tu pedido ya está en la cocina. Te avisaremos cuando esté listo para recoger.
           </p>
         ) : (
-          <button type="button" onClick={() => void pagarPedido()} disabled={pagando} className={claseBoton}>
-            {pagando ? 'Procesando pago…' : `Pagar $${pedido.total}`}
-          </button>
+          <>
+            <p className="rounded-lg bg-surface-container px-3 py-2 text-sm text-on-surface-variant">
+              Este proceso no captura datos de tarjeta.
+            </p>
+            <Boton onClick={() => void pagarPedido()} disabled={pagando} className="min-h-12 w-full text-base">
+              {pagando ? 'Procesando…' : `Pagar $${pedido.total}`}
+            </Boton>
+          </>
         )}
 
-        <div>
-          <Link to="/menu" className="text-sm font-medium text-slate-700 underline">
+        <div className="flex flex-wrap gap-3">
+          <Boton onClick={() => navegar('/mis-pedidos')}>Ver mis pedidos</Boton>
+          <Boton variante="secundario" onClick={() => navegar('/menu')}>
             Volver al menú
-          </Link>
+          </Boton>
         </div>
       </section>
     )
@@ -218,38 +246,43 @@ export function ConfirmarPedido() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold text-slate-900">Confirmar pedido</h1>
+      <div className="flex items-center gap-3">
+        <Boton variante="secundario" onClick={() => navegar('/menu')}>
+          Regresar
+        </Boton>
+        <h1 className="font-heading text-2xl font-bold text-on-surface">Revisa tu pedido</h1>
+      </div>
 
-      <ul className="flex flex-col gap-2">
-        {lineas.map((linea) => (
-          <li
-            key={linea.menu_dia_id}
-            className="flex items-center justify-between gap-3 rounded border border-slate-200 bg-white px-4 py-3"
-          >
-            <div>
-              <p className="text-sm font-medium text-slate-900">{linea.platillo}</p>
-              <p className="text-xs text-slate-600">
-                {linea.cantidad} × ${linea.precio}
+      <Tarjeta className="p-4">
+        <ul className="flex flex-col gap-2">
+          {lineas.map((linea) => (
+            <li key={linea.menu_dia_id} className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium text-on-surface">{linea.platillo}</p>
+                <p className="text-xs text-on-surface-variant">
+                  {linea.cantidad} × ${linea.precio}
+                </p>
+              </div>
+              <p className="font-heading text-sm font-bold text-on-surface">
+                ${(Number(linea.precio) * linea.cantidad).toFixed(2)}
               </p>
-            </div>
-            <p className="text-sm font-semibold text-slate-900">
-              ${(Number(linea.precio) * linea.cantidad).toFixed(2)}
-            </p>
-          </li>
-        ))}
-      </ul>
-
-      <p className="text-right text-base font-semibold text-slate-900">Total: ${total}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 text-right font-heading text-2xl font-extrabold text-primary">
+          Total: ${total}
+        </p>
+      </Tarjeta>
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="horario" className="text-sm font-medium text-slate-700">
-          Horario de recolección (mínimo 10 minutos)
+        <label htmlFor="horario" className="text-sm font-medium text-on-surface-variant">
+          Hora de recolección
         </label>
         <select
           id="horario"
           value={horario}
-          onChange={(evento) => setHorario(evento.target.value)}
-          className="min-h-11 rounded border border-slate-300 bg-white px-3 text-sm text-slate-900"
+          onChange={(evento) => elegirHorario(evento.target.value)}
+          className="min-h-11 rounded-lg border border-outline bg-surface-container-lowest px-3 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
         >
           <option value="">Elige un horario</option>
           {slots.map((slot) => (
@@ -258,27 +291,37 @@ export function ConfirmarPedido() {
             </option>
           ))}
         </select>
+        <p className="text-xs text-on-surface-variant">
+          El pedido debe hacerse con al menos 10 minutos de anticipación.
+        </p>
+        {horarioCorto && (
+          <p role="alert" className="text-sm font-medium text-error">
+            Esa hora ya no alcanza la anticipación mínima{horaMinima ? ` (a partir de las ${horaMinima})` : ''}.
+          </p>
+        )}
         {slots.length === 0 && (
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-on-surface-variant">
             Ya no hay horarios disponibles hoy. Vuelve mañana.
           </p>
         )}
       </div>
 
       {mensaje && (
-        <p role="alert" className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="rounded-lg bg-error-container px-3 py-2 text-sm text-on-error-container">
           {mensaje}
         </p>
       )}
 
-      <div className="flex flex-wrap gap-3">
-        <button type="button" onClick={() => void crearPedido()} disabled={creando || slots.length === 0} className={claseBoton}>
-          {creando ? 'Creando pedido…' : 'Confirmar y pagar'}
-        </button>
-        <Link to="/menu" className="inline-flex min-h-11 items-center px-2 text-sm font-medium text-slate-700 underline">
-          Seguir eligiendo
-        </Link>
-      </div>
+      <Boton
+        onClick={() => void crearPedido()}
+        disabled={creando || slots.length === 0}
+        className="min-h-12 w-full text-base"
+      >
+        {creando ? 'Creando pedido…' : 'Continuar al pago'}
+      </Boton>
+      <p className="text-center text-xs text-on-surface-variant">
+        Recogida presencial en la cafetería.
+      </p>
 
       <button
         type="button"
@@ -288,7 +331,7 @@ export function ConfirmarPedido() {
           setLineas([])
           navegar('/menu')
         }}
-        className="self-start text-sm font-medium text-red-700 underline"
+        className="self-start text-sm font-medium text-error underline"
       >
         Vaciar carrito
       </button>
