@@ -132,8 +132,8 @@ verificar contadores y confirmar que las rutas ajenas siguen denegadas.
 
 ### Implementation for User Story 4
 
-- [ ] T017 [US4] Rediseñar `frontend/src/pages/caja/Caja.tsx` (acciones rápidas, catálogo con búsqueda/categorías/stepper, barra flotante de cobro, resumen con CTA único Registrar y cobrar, resultado con folio) con tokens y componentes `ui/` (FR-005, FR-011)
-- [ ] T018 [US4] Implementar `frontend/src/pages/caja/Entregas.tsx` (ruta `/caja/entregas`: lista por llegada, folio mono 20px+, Entregar/Cancelar 44px, vacío "¡Todo está al día!", refresco de contador) (edita archivo de T012; secuencial; FR-011, FR-014)
+- [x]  [US4] Rediseñar `frontend/src/pages/caja/Caja.tsx` (acciones rápidas, catálogo con búsqueda/categorías/stepper, barra flotante de cobro, resumen con CTA único Registrar y cobrar, resultado con folio) con tokens y componentes `ui/` (FR-005, FR-011)
+- [x]  [US4] Implementar `frontend/src/pages/caja/Entregas.tsx` (ruta `/caja/entregas`: lista por llegada, folio mono 20px+, Entregar/Cancelar 44px, vacío "¡Todo está al día!", refresco de contador) (edita archivo de T012; secuencial; FR-011, FR-014)
 
 **Checkpoint**: US4 funcional de forma independiente
 
@@ -147,7 +147,7 @@ verificar contadores y confirmar que las rutas ajenas siguen denegadas.
 
 ### Implementation for User Story 5
 
-- [ ] T019 [US5] Rediseñar `frontend/src/pages/cocina/Cocina.tsx` (tarjeta KDS: folio heading 800, chip de origen, "recoge HH:MM", transcurrido con "¡Retrasado!", CTA único 48px, Listo sin CTA; grid 2 columnas por estado en escritorio, lista única en móvil; conserva sondeo 4 s con "act. hace X s" y "Sin conexión") con tokens (FR-004, FR-005, FR-012, FR-014)
+- [x]  [US5] Rediseñar `frontend/src/pages/cocina/Cocina.tsx` (tarjeta KDS: folio heading 800, chip de origen, "recoge HH:MM", transcurrido con "¡Retrasado!", CTA único 48px, Listo sin CTA; grid 2 columnas por estado en escritorio, lista única en móvil; conserva sondeo 4 s con "act. hace X s" y "Sin conexión") con tokens (FR-004, FR-005, FR-012, FR-014)
 
 **Checkpoint**: US5 funcional de forma independiente
 
@@ -161,8 +161,8 @@ verificar contadores y confirmar que las rutas ajenas siguen denegadas.
 
 ### Implementation for User Story 6
 
-- [ ] T020 [US6] Implementar `frontend/src/pages/admin/InicioAdmin.tsx` (ruta `/admin`: saludo, 3 accesos rápidos con conteos de endpoints existentes, resumen del menú de hoy con Especial/disponibilidad) (edita archivo de T012; secuencial; FR-013)
-- [ ] T021 [P] [US6] Migrar `frontend/src/pages/admin/Usuarios.tsx`, `frontend/src/pages/admin/Platillos.tsx` y `frontend/src/pages/admin/MenuDelDia.tsx` a tokens (filas ≥ 56 px, CTA fijos, buscadores/chips existentes, mismos formularios) (FR-013, FR-014)
+- [x]  [US6] Implementar `frontend/src/pages/admin/InicioAdmin.tsx` (ruta `/admin`: saludo, 3 accesos rápidos con conteos de endpoints existentes, resumen del menú de hoy con Especial/disponibilidad) (edita archivo de T012; secuencial; FR-013)
+- [x]  [P] [US6] Migrar `frontend/src/pages/admin/Usuarios.tsx`, `frontend/src/pages/admin/Platillos.tsx` y `frontend/src/pages/admin/MenuDelDia.tsx` a tokens (filas ≥ 56 px, CTA fijos, buscadores/chips existentes, mismos formularios) (FR-013, FR-014)
 
 **Checkpoint**: Todas las historias funcionalmente independientes
 
@@ -172,9 +172,9 @@ verificar contadores y confirmar que las rutas ajenas siguen denegadas.
 
 **Purpose**: Verde total, validación del quickstart y revisión de alcance.
 
-- [ ] T022 Verificar que `npm run lint`, `npm run typecheck` y `npm test` pasan en `frontend/` (y `npm test` + `npm run typecheck` en `backend/` como regresión), con áreas ≥ 44 px y contraste en las 4 áreas de rol
-- [ ] T023 Ejecutar la validación de `specs/007-ui-redesign/quickstart.md` (5 escenarios, demo por rol ante la patrocinadora)
-- [ ] T024 Revisar contra FR-016 que ningún elemento [Fuera de alcance] (fotos, push/SMS, historial de ventas, métricas, métodos de pago, descuentos, favoritos/reseñas, configuración) quedó implementado
+- [x]  Verificar que `npm run lint`, `npm run typecheck` y `npm test` pasan en `frontend/` (y `npm test` + `npm run typecheck` en `backend/` como regresión), con áreas ≥ 44 px y contraste en las 4 áreas de rol
+- [x]  Ejecutar la validación de `specs/007-ui-redesign/quickstart.md` (5 escenarios, demo por rol ante la patrocinadora)
+- [x]  Revisar contra FR-016 que ningún elemento [Fuera de alcance] (fotos, push/SMS, historial de ventas, métricas, métodos de pago, descuentos, favoritos/reseñas, configuración) quedó implementado
 
 ---
 
