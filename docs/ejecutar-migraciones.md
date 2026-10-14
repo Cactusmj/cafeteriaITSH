@@ -37,7 +37,7 @@ Se otorgan los permisos sobre `cafeteria_itsh.*` aunque la base todavía no exis
 
 ## Paso 2: ejecutar los scripts de migración
 
-**Importante:** ejecutar `001`, luego `002` y por último `003`. El `001` crea la base de datos y las tablas; el `002` inserta los datos base (roles, estados, transiciones, platillos y menú de ejemplo); el `003` agrega la columna `clave_idempotencia` de `pedido` (sprint 3, evita pedidos duplicados).
+**Importante:** ejecutar `001`, luego `002`, `003` y por último `004`. El `001` crea la base de datos y las tablas; el `002` inserta los datos base (roles, estados, transiciones, platillos y menú de ejemplo); el `003` agrega la columna `clave_idempotencia` de `pedido` (sprint 3, evita pedidos duplicados); el `004` amplía el catálogo de canal y lectura de `notificacion` (sprint 5, avisos en-app).
 
 Desde CMD, redirigiendo la entrada del archivo con `<`:
 
@@ -45,6 +45,7 @@ Desde CMD, redirigiendo la entrada del archivo con `<`:
 mysql -u cafe_admin -p < migrations\001_crear_esquema_mysql.sql
 mysql -u cafe_admin -p < migrations\002_seed_inicial_mysql.sql
 mysql -u cafe_admin -p < migrations\003_clave_idempotencia_pedido.sql
+mysql -u cafe_admin -p < migrations\004_avisos_app.sql
 ```
 
 Desde PowerShell 5.1 (que no admite el operador `<`), invoca CMD con `cmd /c`:
@@ -53,6 +54,7 @@ Desde PowerShell 5.1 (que no admite el operador `<`), invoca CMD con `cmd /c`:
 cmd /c "mysql -u cafe_admin -p < migrations\001_crear_esquema_mysql.sql"
 cmd /c "mysql -u cafe_admin -p < migrations\002_seed_inicial_mysql.sql"
 cmd /c "mysql -u cafe_admin -p < migrations\003_clave_idempotencia_pedido.sql"
+cmd /c "mysql -u cafe_admin -p < migrations\004_avisos_app.sql"
 ```
 
 > No uses `mysql -e "source archivo.sql"`: en MySQL 9.6 el comando `source` solo funciona dentro de la sesión interactiva, no con `-e`.
@@ -71,6 +73,7 @@ Dentro de la sesión `mysql>`:
 source migrations/001_crear_esquema_mysql.sql
 source migrations/002_seed_inicial_mysql.sql
 source migrations/003_clave_idempotencia_pedido.sql
+source migrations/004_avisos_app.sql
 ```
 
 Si `mysql` no está en el PATH, usa la ruta completa desde CMD:
@@ -84,7 +87,7 @@ Si `mysql` no está en el PATH, usa la ruta completa desde CMD:
 1. Abre MySQL Workbench y crea una conexión con los datos de la tabla de arriba (host `127.0.0.1`, puerto `3306`, usuario `cafe_admin`).
 2. Abre el archivo `migrations/001_crear_esquema_mysql.sql` (File → Open SQL Script).
 3. Ejecuta todo el script con el botón del rayo (Execute) o Ctrl+Shift+Enter.
-4. Repite con `migrations/002_seed_inicial_mysql.sql` y luego con `migrations/003_clave_idempotencia_pedido.sql`.
+4. Repite con `migrations/002_seed_inicial_mysql.sql`, luego con `migrations/003_clave_idempotencia_pedido.sql` y por último con `migrations/004_avisos_app.sql`.
 
 ## Verificar que todo quedó bien
 
