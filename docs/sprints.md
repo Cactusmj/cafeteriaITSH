@@ -194,6 +194,18 @@ y 10 de frontend en verde, lint y typecheck en verde, validación del
 
 ---
 
+## Post-MVP — Rediseño UI
+
+**Feature**: `specs/007-ui-redesign/`
+
+**Objetivo**: aplicar la identidad visual institucional y mejorar la navegación
+por rol sin cambiar los flujos funcionales del MVP.
+
+**Estado**: completado — 24 tareas completadas, validación del
+`quickstart.md` ejecutada y demo por rol aprobada por la patrocinadora.
+
+---
+
 ## Reglas de trazabilidad
 
 - Cada spec de sprint referencia las user stories y FRs de la spec maestra 001;
