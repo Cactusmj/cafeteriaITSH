@@ -67,7 +67,7 @@ fallido y verificar que el pedido permanece "Pendiente".
 
 ### Edge Cases
 
-- El cliente elige un horario de recolección a exactamente 10 minutos (o a menos) desde la confirmación: debe rechazarse; solo se admite a partir de 10 minutos completos.
+- El cliente elige un horario de recolección con menos de 10 minutos de anticipación desde la confirmación: debe rechazarse; se admite a partir de 10 minutos completos.
 - El cliente elige un horario de recolección ya pasado o de otro día.
 - Un platillo es marcado como no disponible (o se le modifica el precio) entre la selección del cliente y la confirmación: el sistema debe rechazarlo o cobrar el precio vigente al confirmar, sin sorpresas.
 - El pago falla, se cancela o nunca se confirma: el pedido debe permanecer "Pendiente" y nunca quedar como "Pagado".

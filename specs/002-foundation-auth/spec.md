@@ -66,7 +66,7 @@ acceso cambia.
 
 ### Edge Cases
 
-- Un correo ya registrado en un intento de registro o de alta de usuario.
+- Un correo ya registrado en un intento de registro o de alta de usuario (respuesta clara con el código `CORREO_EN_USO`).
 - Contraseña vacía, demasiado corta o sin el formato mínimo requerido.
 - Token JWT ausente, expirado o manipulado en una ruta protegida.
 - Un administrador intenta deshabilitar su propia cuenta.
@@ -86,7 +86,7 @@ acceso cambia.
 - **FR-006a**: El registro público MUST permitir únicamente cuentas con rol cliente (alumno/docente); MUST NOT permitir crear cuentas administrativas u operativas.
 - **FR-007**: El sistema MUST exponer un endpoint de inicio de sesión y uno de registro (solo clientes) bajo una API REST, con códigos HTTP apropiados.
 - **FR-008**: El sistema MUST validar y sanitizar los datos recibidos antes de procesarlos o almacenarlos, tanto en el cliente como en el servidor; la contraseña MUST tener al menos 8 caracteres.
-- **FR-009**: El sistema MUST mostrar mensajes de error claros sin revelar si una cuenta existe ni exponer detalles internos.
+- **FR-009**: El sistema MUST mostrar mensajes de error claros sin exponer detalles internos. La regla de no revelar si una cuenta existe aplica al inicio de sesión; el registro público y el alta de usuarios operativos MAY responder `CORREO_EN_USO` (409) cuando el correo ya está registrado.
 - **FR-010**: El sistema MUST disponer de un esquema inicial de base de datos con usuarios y roles y de cuentas sembradas con contraseña con hash: un administrador y al menos un cajero y un cocinero de ejemplo. Las cuentas se crean con el script `backend/scripts/sembrar-usuarios.mjs`, que toma la contraseña de la variable de entorno `SEED_PASSWORD` (nunca del repositorio); véase `docs/seeds.md`.
 - **FR-011**: El frontend MUST ser una aplicación única de React + TypeScript con rutas `/login`, `/admin`, `/caja`, `/cocina`, `/menu` y `/mis-pedidos`, protegidas por sesión y rol.
 - **FR-012**: El sistema MUST ofrecer una pantalla de inicio de sesión y layouts por rol, responsivos en móvil y computadora.

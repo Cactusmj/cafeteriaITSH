@@ -113,6 +113,21 @@ $detalle.pago.referencia  # sbx-...
 2. `GET /api/pedidos/{id}` → el detalle conserva el precio con el que se
    registró.
 
+## Prueba de concurrencia (opcional, MySQL real)
+
+La prueba de 5 pagos simultáneos se salta por defecto para no depender de MySQL.
+Requiere `backend/.env` apuntando a una base de pruebas con las migraciones
+`001`, `002` y `003` y el seed inicial aplicados.
+
+```powershell
+$env:DB_PRUEBAS = "1"
+npm test -- tests/integracion/pagos.concurrentes.test.ts
+Remove-Item Env:DB_PRUEBAS
+```
+
+Resultado esperado: las 5 peticiones responden `Pagado`, existe una sola fila
+en `pago` y el pedido queda en estado `Pagado`.
+
 ## Puertas de calidad
 
 ```powershell

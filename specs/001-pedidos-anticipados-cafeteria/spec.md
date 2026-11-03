@@ -179,44 +179,54 @@ verificar que puede iniciar sesión con su rol.
 
 ## Requirements *(mandatory)*
 
-### Functional Requirements
+### Functional Requirements (notación EARS)
 
-- **FR-001**: El sistema MUST permitir el registro y el inicio de sesión con correo electrónico y contraseña.
-- **FR-002**: El sistema MUST asignar a cada usuario exactamente un rol: administrador, cajero, cocinero o alumno/docente.
-- **FR-003**: El sistema MUST restringir cada módulo al rol correspondiente y denegar el acceso a los demás roles.
-- **FR-004**: El sistema MUST mantener las sesiones autenticadas y cerrar el acceso cuando no haya sesión activa.
-- **FR-005**: El sistema MUST almacenar las contraseñas de forma no legible (nunca en texto plano).
-- **FR-006**: El administrador MUST poder crear, editar y gestionar cuentas de cajeros y cocineros.
-- **FR-007**: El administrador MUST poder crear, editar y gestionar platillos con nombre, categoría y descripción.
-- **FR-008**: El administrador MUST poder definir el menú de cada día seleccionando platillos, con su precio y su estado de disponibilidad.
-- **FR-009**: El administrador MUST poder marcar platillos como especiales del día.
-- **FR-010**: El sistema MUST reflejar de inmediato los cambios del menú para los clientes.
-- **FR-011**: El sistema MUST impedir que platillos no disponibles se seleccionen en nuevos pedidos.
-- **FR-012**: Los clientes MUST poder consultar el menú del día con platillos, precios, disponibilidad y especiales.
-- **FR-013**: Los clientes MUST poder seleccionar uno o más platillos disponibles con sus cantidades.
-- **FR-014**: El sistema MUST mostrar el total del pedido antes de confirmarlo.
-- **FR-015**: El sistema MUST requerir al menos 10 minutos de anticipación entre la confirmación del pedido y el horario de recolección.
-- **FR-016**: El sistema MUST impedir la creación de pedidos anticipados con menos de 10 minutos de anticipación.
-- **FR-017**: El pago MUST formar parte del flujo de confirmación del pedido anticipado.
-- **FR-018**: El sistema MUST registrar únicamente la información necesaria para identificar y validar una transacción de pago, sin almacenar datos sensibles de tarjetas.
-- **FR-019**: El sistema MUST marcar un pedido anticipado como "Pagado" únicamente cuando el pago se confirme.
-- **FR-020**: El sistema MUST mantener cada pedido en un estado que refleje su progreso, con los estados mínimos: Pendiente, Pagado, En preparación, Listo, Entregado y Cancelado.
-- **FR-021**: El sistema MUST permitir solo las transiciones válidas del flujo principal (Pendiente → Pagado → En preparación → Listo → Entregado) y el paso a Cancelado antes de la entrega.
-- **FR-022**: El sistema MUST impedir saltarse estados y modificar pedidos en estado Entregado o Cancelado.
-- **FR-023**: El cajero MUST poder capturar pedidos realizados presencialmente con sus platillos y cantidades.
-- **FR-023a**: El sistema MUST permitir registrar y gestionar el cobro de los pedidos de mostrador.
-- **FR-022b**: El sistema MUST operar simultáneamente pedidos anticipados y pedidos de mostrador sin interrumpir el servicio presencial.
-- **FR-023b**: La interfaz de cocina MUST mostrar los pedidos entrantes (anticipados y de mostrador) con los productos y cantidades a preparar.
-- **FR-024**: El sistema MUST permitir al cocinero cambiar el estado del pedido a "En preparación" y a "Listo".
-- **FR-025**: El sistema MUST facilitar la identificación del orden de preparación de los pedidos.
-- **FR-026**: La pantalla de cocina MUST actualizarse para reflejar los pedidos que deben prepararse sin recarga manual.
-- **FR-027**: El sistema MUST notificar al cliente cuando su pedido pase a "Listo".
-- **FR-028**: El sistema MUST mantener la funcionalidad de notificaciones separada de la lógica principal de pedidos.
-- **FR-029**: Los clientes MUST poder consultar la lista y el detalle de sus propios pedidos.
-- **FR-030**: El sistema MUST validar los datos antes de procesarlos o almacenarlos, tanto de entrada como en el servidor.
-- **FR-031**: El sistema MUST mostrar mensajes de error claros sin exponer detalles internos.
-- **FR-032**: El sistema MUST registrar los errores necesarios para mantenimiento sin exponer información sensible al usuario.
-- **FR-033**: El sistema MUST evitar la creación de pedidos duplicados ante reintentos de pago o reconexión.
+Convención EARS usada en esta especificación:
+
+- **[Ubicuo]**: comportamiento siempre activo → «El sistema deberá…».
+- **[Evento]**: dirigido por evento → «Cuando [evento], el sistema deberá…».
+- **[Estado]**: dirigido por estado → «Mientras [estado], el sistema deberá…».
+- **[No deseado]**: excepciones o fallos → «Si [condición no deseada], el sistema deberá…».
+- **[Opcional]**: característica que puede o no estar presente → «El sistema podrá…».
+
+No hay requisitos **[Opcional]** en el MVP; todos los requisitos listados son exigibles.
+
+- **FR-001** [Ubicuo]: El sistema deberá permitir el registro y el inicio de sesión con correo electrónico y contraseña.
+- **FR-002** [Ubicuo]: El sistema deberá asignar a cada usuario exactamente un rol: administrador, cajero, cocinero o alumno/docente.
+- **FR-003** [Evento]: Cuando un usuario intente acceder a un módulo, el sistema deberá permitir el acceso solo si el módulo corresponde a su rol y denegarlo en caso contrario.
+- **FR-004** [Estado]: Mientras no exista una sesión activa, el sistema deberá denegar el acceso a los módulos protegidos.
+- **FR-005** [Ubicuo]: El sistema deberá almacenar las contraseñas de forma no legible (nunca en texto plano).
+- **FR-006** [Ubicuo]: El sistema deberá permitir al administrador crear, editar y gestionar cuentas de cajeros y cocineros.
+- **FR-007** [Ubicuo]: El sistema deberá permitir al administrador crear, editar y gestionar platillos con nombre, categoría y descripción.
+- **FR-008** [Ubicuo]: El sistema deberá permitir al administrador definir el menú de cada día seleccionando platillos, con su precio y su estado de disponibilidad.
+- **FR-009** [Ubicuo]: El sistema deberá permitir al administrador marcar platillos como especiales del día.
+- **FR-010** [Evento]: Cuando el administrador actualice el menú del día, el sistema deberá reflejar los cambios de inmediato para los clientes.
+- **FR-011** [Estado]: Mientras un platillo esté marcado como no disponible, el sistema deberá impedir su selección en nuevos pedidos.
+- **FR-012** [Ubicuo]: El sistema deberá permitir a los clientes consultar el menú del día con platillos, precios, disponibilidad y especiales.
+- **FR-013** [Ubicuo]: El sistema deberá permitir a los clientes seleccionar uno o más platillos disponibles con sus cantidades.
+- **FR-014** [Evento]: Cuando el cliente seleccione platillos y cantidades válidas, el sistema deberá mostrar el total del pedido antes de confirmarlo.
+- **FR-015** [Ubicuo]: El sistema deberá exigir al menos 10 minutos de anticipación entre la confirmación del pedido y el horario de recolección.
+- **FR-016** [No deseado]: Si el horario de recolección solicitado tiene menos de 10 minutos de anticipación o ya pasó, el sistema deberá impedir la creación del pedido anticipado.
+- **FR-017** [Ubicuo]: El pago deberá formar parte del flujo de confirmación del pedido anticipado.
+- **FR-018** [Ubicuo]: El sistema deberá registrar únicamente la información necesaria para identificar y validar una transacción de pago, sin almacenar datos sensibles de tarjetas.
+- **FR-019** [Evento]: Cuando el pago sea confirmado, el sistema deberá marcar el pedido anticipado como "Pagado".
+- **FR-020** [Ubicuo]: El sistema deberá mantener cada pedido en un estado que refleje su progreso, con los estados mínimos: Pendiente, Pagado, En preparación, Listo, Entregado y Cancelado.
+- **FR-021** [Estado]: Mientras un pedido no esté en estado Entregado ni Cancelado, el sistema deberá permitir únicamente las transiciones válidas del flujo principal (Pendiente → Pagado → En preparación → Listo → Entregado) y el paso a Cancelado antes de la entrega.
+- **FR-022** [No deseado]: Si se solicita una transición inválida (saltarse estados) o modificar un pedido en estado Entregado o Cancelado, el sistema deberá rechazar la operación.
+- **FR-023** [Ubicuo]: El sistema deberá permitir al cajero capturar pedidos realizados presencialmente con sus platillos y cantidades.
+- **FR-023a** [Ubicuo]: El sistema deberá permitir registrar y gestionar el cobro de los pedidos de mostrador.
+- **FR-022b** [Ubicuo]: El sistema deberá operar simultáneamente pedidos anticipados y pedidos de mostrador sin interrumpir el servicio presencial.
+- **FR-023b** [Estado]: Mientras existan pedidos entrantes (anticipados y de mostrador), la interfaz de cocina deberá mostrarlos con los productos y cantidades a preparar.
+- **FR-024** [Ubicuo]: El sistema deberá permitir al cocinero cambiar el estado del pedido a "En preparación" y a "Listo".
+- **FR-025** [Ubicuo]: El sistema deberá facilitar la identificación del orden de preparación de los pedidos.
+- **FR-026** [Evento]: Cuando se registre un pedido nuevo o cambie el estado de un pedido, la pantalla de cocina deberá actualizarse para reflejar los pedidos que deben prepararse sin recarga manual.
+- **FR-027** [Evento]: Cuando un pedido pase a "Listo", el sistema deberá notificar al cliente que hizo el pedido.
+- **FR-028** [Ubicuo]: El sistema deberá mantener la funcionalidad de notificaciones separada de la lógica principal de pedidos.
+- **FR-029** [Ubicuo]: El sistema deberá permitir a los clientes consultar la lista y el detalle de sus propios pedidos.
+- **FR-030** [Ubicuo]: El sistema deberá validar los datos antes de procesarlos o almacenarlos, tanto de entrada como en el servidor.
+- **FR-031** [Ubicuo]: El sistema deberá mostrar mensajes de error claros sin exponer detalles internos.
+- **FR-032** [Ubicuo]: El sistema deberá registrar los errores necesarios para mantenimiento sin exponer información sensible al usuario.
+- **FR-033** [No deseado]: Si el cliente reintenta el pago o se reconecta durante el pago, el sistema deberá evitar la creación de pedidos duplicados.
 
 ### Key Entities *(include if feature involves data)*
 
