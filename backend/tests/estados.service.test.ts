@@ -1,13 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/config/db.js', () => ({
-  pool: { execute: vi.fn() },
+  pool: { execute: vi.fn(), getConnection: vi.fn() },
 }));
 
 import { pool } from '../src/config/db.js';
 import { avanzarEstado } from '../src/services/pedidos.service.js';
 
 const ejecutar = pool.execute as unknown as import('vitest').Mock;
+const obtenerConexion = pool.getConnection as unknown as import('vitest').Mock;
+
+const conexion = {
+  execute: ejecutar,
+  beginTransaction: vi.fn(),
+  commit: vi.fn(),
+  rollback: vi.fn(),
+  release: vi.fn(),
+};
 
 const filaPagado = {
   id: 4,
@@ -25,6 +34,12 @@ const cajero = { id: 2, rol: 'cajero' };
 
 beforeEach(() => {
   ejecutar.mockReset();
+  obtenerConexion.mockReset();
+  conexion.beginTransaction.mockReset();
+  conexion.commit.mockReset();
+  conexion.rollback.mockReset();
+  conexion.release.mockReset();
+  obtenerConexion.mockResolvedValue(conexion);
 });
 
 describe('pedidos.service.avanzarEstado (cocinero)', () => {
@@ -117,6 +132,17 @@ describe('pedidos.service.avanzarEstado (cajero)', () => {
     });
   });
 
+  it('rechaza cambios sobre un pedido Cancelado', async () => {
+    ejecutar.mockResolvedValueOnce([[{ ...filaPagado, estado: 'Cancelado' }], []]);
+
+    await expect(avanzarEstado(4, cajero, 'Entregado')).rejects.toMatchObject({
+      codigo: 'ESTADO_INVALIDO',
+      estadoHttp: 409,
+    });
+    expect(ejecutar).toHaveBeenCalledTimes(1);
+    expect(conexion.rollback).toHaveBeenCalled();
+  });
+
   it.each(['Pendiente', 'Pagado', 'En preparación', 'Listo'])(
     'cancela desde %s',
     async (estado) => {
@@ -174,6 +200,47 @@ describe('pedidos.service.avanzarEstado dispara avisos', () => {
     expect(ejecutar).toHaveBeenCalledTimes(6);
     const sqlAviso = String(ejecutar.mock.calls[5]?.[0] ?? '');
     expect(sqlAviso).toContain('INSERT INTO notificacion');
+  });
+
+  it('no falla el cambio de estado si el aviso no se puede registrar', async () => {
+    ejecutar
+      .mockResolvedValueOnce([[filaEnPreparacion], []])
+      .mockResolvedValueOnce([[{ valida: 1 }], []])
+      .mockResolvedValueOnce([
+        [
+          { id: 3, nombre: 'En preparación' },
+          { id: 4, nombre: 'Listo' },
+        ],
+        [],
+      ])
+      .mockResolvedValueOnce([{ affectedRows: 1 }, []])
+      .mockResolvedValueOnce([{ insertId: 9 }, []])
+      .mockRejectedValueOnce(new Error('notificacion caida'));
+
+    const cambio = await avanzarEstado(4, cocinero, 'Listo');
+
+    expect(cambio.estado).toBe('Listo');
+    expect(conexion.commit).toHaveBeenCalled();
+  });
+
+  it('hace rollback si falla el historial del cambio de estado', async () => {
+    const error = new Error('fallo al insertar historial');
+    ejecutar
+      .mockResolvedValueOnce([[filaPagado], []])
+      .mockResolvedValueOnce([[{ valida: 1 }], []])
+      .mockResolvedValueOnce([
+        [
+          { id: 2, nombre: 'Pagado' },
+          { id: 3, nombre: 'En preparación' },
+        ],
+        [],
+      ])
+      .mockResolvedValueOnce([{ affectedRows: 1 }, []])
+      .mockRejectedValueOnce(error);
+
+    await expect(avanzarEstado(4, cocinero, 'En preparación')).rejects.toBe(error);
+    expect(conexion.rollback).toHaveBeenCalled();
+    expect(conexion.commit).not.toHaveBeenCalled();
   });
 
   it('no genera aviso en otros destinos', async () => {

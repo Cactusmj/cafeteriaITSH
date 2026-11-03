@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/config/db.js', () => ({
-  pool: { execute: vi.fn() },
+  pool: { execute: vi.fn(), getConnection: vi.fn() },
 }));
 
 import { pool } from '../src/config/db.js';
@@ -9,6 +9,15 @@ import { cobrarMostrador, crearMostrador } from '../src/services/mostrador.servi
 import { obtenerPedidoPorId } from '../src/services/pedidos.service.js';
 
 const ejecutar = pool.execute as unknown as import('vitest').Mock;
+const obtenerConexion = pool.getConnection as unknown as import('vitest').Mock;
+
+const conexion = {
+  execute: ejecutar,
+  beginTransaction: vi.fn(),
+  commit: vi.fn(),
+  rollback: vi.fn(),
+  release: vi.fn(),
+};
 
 const filasMenu = [
   { id: 12, precio: '35.00', disponible: 1, activo: 1, platillo: 'Gordita de chicharrón' },
@@ -38,6 +47,12 @@ const filaMostradorPendiente = {
 
 beforeEach(() => {
   ejecutar.mockReset();
+  obtenerConexion.mockReset();
+  conexion.beginTransaction.mockReset();
+  conexion.commit.mockReset();
+  conexion.rollback.mockReset();
+  conexion.release.mockReset();
+  obtenerConexion.mockResolvedValue(conexion);
 });
 
 describe('mostrador.service.crearMostrador', () => {
@@ -115,6 +130,20 @@ describe('mostrador.service.cobrarMostrador', () => {
       pago: { metodo: 'efectivo', monto: '90.00', referencia: 'efectivo-PED-3F8K2QZA' },
     });
     expect(ejecutar).toHaveBeenCalledTimes(5);
+    expect(conexion.commit).toHaveBeenCalled();
+  });
+
+  it('hace rollback si falla una escritura del cobro', async () => {
+    const error = new Error('fallo al insertar el cobro');
+    ejecutar
+      .mockResolvedValueOnce([[filaMostradorPendiente], []])
+      .mockResolvedValueOnce([[{ id: 2 }], []])
+      .mockResolvedValueOnce([{ affectedRows: 1 }, []])
+      .mockRejectedValueOnce(error);
+
+    await expect(cobrarMostrador(9, 2, 100)).rejects.toBe(error);
+    expect(conexion.rollback).toHaveBeenCalled();
+    expect(conexion.commit).not.toHaveBeenCalled();
   });
 
   it('rechaza COBRO_INSUFICIENTE dejando el pedido Pendiente', async () => {

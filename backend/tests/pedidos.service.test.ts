@@ -22,6 +22,8 @@ function formatearLocal(fecha: Date): string {
 
 const enUnaHora = formatearLocal(new Date(Date.now() + 60 * 60_000));
 const enCincoMinutos = formatearLocal(new Date(Date.now() + 5 * 60_000));
+const enNueveMinutos = formatearLocal(new Date(Date.now() + 9 * 60_000));
+const enOnceMinutos = formatearLocal(new Date(Date.now() + 11 * 60_000));
 
 const pedidoBase = {
   usuarioId: 7,
@@ -80,6 +82,30 @@ describe('pedidos.service.crearPedido', () => {
     await expect(
       crearPedido({ ...pedidoBase, fechaRecoleccion: enCincoMinutos }),
     ).rejects.toMatchObject({ codigo: 'ANTICIPACION_INSUFICIENTE', estadoHttp: 400 });
+  });
+
+  it('rechaza ANTICIPACION_INSUFICIENTE con 9 minutos', async () => {
+    ejecutar.mockResolvedValueOnce([[], []]);
+
+    await expect(
+      crearPedido({ ...pedidoBase, fechaRecoleccion: enNueveMinutos }),
+    ).rejects.toMatchObject({ codigo: 'ANTICIPACION_INSUFICIENTE', estadoHttp: 400 });
+  });
+
+  it('acepta la creación con 11 minutos de anticipación', async () => {
+    ejecutar
+      .mockResolvedValueOnce([[], []])
+      .mockResolvedValueOnce([[{ id: 1 }], []])
+      .mockResolvedValueOnce([filasMenu, []])
+      .mockResolvedValueOnce([{ insertId: 3 }, []])
+      .mockResolvedValueOnce([{ insertId: 21 }, []])
+      .mockResolvedValueOnce([{ insertId: 22 }, []])
+      .mockResolvedValueOnce([{ insertId: 31 }, []]);
+
+    const pedido = await crearPedido({ ...pedidoBase, fechaRecoleccion: enOnceMinutos });
+
+    expect(pedido).toMatchObject({ id: 3, estado: 'Pendiente', total: '95.00' });
+    expect(ejecutar).toHaveBeenCalledTimes(7);
   });
 
   it('rechaza ANTICIPACION_INSUFICIENTE con un horario ya pasado', async () => {

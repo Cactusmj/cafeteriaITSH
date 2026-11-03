@@ -1,10 +1,11 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { pool } from '../config/db.js';
+import { conTransaccion } from '../config/transacciones.js';
 import { ROL } from '../config/roles.js';
 import { ErrorAplicacion } from '../utils/errores.js';
 import {
-  cargarPago,
-  cargarPedido,
+  cargarPagoCon,
+  cargarPedidoBloqueado,
   esDuplicado,
   formatearFechaHora,
   formatearImporte,
@@ -159,81 +160,83 @@ export async function cobrarMostrador(
   cajeroId: number,
   montoRecibido: number,
 ): Promise<CobroRespuesta> {
-  const fila = await cargarPedido(id);
-  if (!fila) {
-    throw new ErrorAplicacion(404, 'PEDIDO_NO_ENCONTRADO', 'Pedido no encontrado');
-  }
-  if (fila.tipo !== 'mostrador') {
-    throw new ErrorAplicacion(409, 'ESTADO_INVALIDO', 'Solo los pedidos de mostrador se cobran en caja');
-  }
-
-  if (fila.estado === 'Pagado') {
-    const pago = await cargarPago(id);
-    if (!pago) {
-      throw new Error('El pedido está Pagado pero no tiene registro de cobro');
+  return conTransaccion(async (conexion) => {
+    const fila = await cargarPedidoBloqueado(conexion, id);
+    if (!fila) {
+      throw new ErrorAplicacion(404, 'PEDIDO_NO_ENCONTRADO', 'Pedido no encontrado');
     }
+    if (fila.tipo !== 'mostrador') {
+      throw new ErrorAplicacion(409, 'ESTADO_INVALIDO', 'Solo los pedidos de mostrador se cobran en caja');
+    }
+
+    if (fila.estado === 'Pagado') {
+      const pago = await cargarPagoCon(conexion, id);
+      if (!pago) {
+        throw new Error('El pedido está Pagado pero no tiene registro de cobro');
+      }
+      return {
+        id: fila.id,
+        numero: fila.numero,
+        estado: 'Pagado',
+        total: formatearImporte(fila.total),
+        monto_recibido: formatearImporte(fila.total),
+        cambio: '0.00',
+        pago,
+      };
+    }
+
+    if (fila.estado !== 'Pendiente') {
+      throw new ErrorAplicacion(409, 'ESTADO_INVALIDO', 'El pedido no está pendiente de cobro');
+    }
+
+    const total = Number(fila.total);
+    if (montoRecibido < total) {
+      throw new ErrorAplicacion(
+        402,
+        'COBRO_INSUFICIENTE',
+        'El monto recibido es menor que el total',
+      );
+    }
+
+    const [estados] = await conexion.execute<RowDataPacket[]>(
+      "SELECT id FROM estado_pedido WHERE nombre = 'Pagado' LIMIT 1",
+    );
+    const pagadoId = estados[0]?.id;
+    if (!pagadoId) {
+      throw new Error('Falta el estado Pagado en la base de datos');
+    }
+
+    const referencia = `efectivo-${fila.numero}`;
+    const monto = formatearImporte(total);
+
+    await conexion.execute<ResultSetHeader>('UPDATE pedido SET estado_id = ? WHERE id = ?', [
+      pagadoId,
+      id,
+    ]);
+    await conexion.execute<ResultSetHeader>(
+      `INSERT INTO pago (pedido_id, metodo, monto, referencia, registrado_por)
+       VALUES (?, 'efectivo', ?, ?, ?)`,
+      [id, monto, referencia, cajeroId],
+    );
+    await conexion.execute<ResultSetHeader>(
+      `INSERT INTO pedido_estado_historial (pedido_id, estado_anterior_id, estado_nuevo_id, cambiado_por)
+       VALUES (?, (SELECT id FROM estado_pedido WHERE nombre = 'Pendiente' LIMIT 1), ?, ?)`,
+      [id, pagadoId, cajeroId],
+    );
+
     return {
       id: fila.id,
       numero: fila.numero,
       estado: 'Pagado',
-      total: formatearImporte(fila.total),
-      monto_recibido: formatearImporte(fila.total),
-      cambio: '0.00',
-      pago,
+      total: monto,
+      monto_recibido: formatearImporte(montoRecibido),
+      cambio: formatearImporte(montoRecibido - total),
+      pago: {
+        metodo: 'efectivo',
+        monto,
+        referencia,
+        fecha: formatearFechaHora(new Date()),
+      },
     };
-  }
-
-  if (fila.estado !== 'Pendiente') {
-    throw new ErrorAplicacion(409, 'ESTADO_INVALIDO', 'El pedido no está pendiente de cobro');
-  }
-
-  const total = Number(fila.total);
-  if (montoRecibido < total) {
-    throw new ErrorAplicacion(
-      402,
-      'COBRO_INSUFICIENTE',
-      'El monto recibido es menor que el total',
-    );
-  }
-
-  const [estados] = await pool.execute<RowDataPacket[]>(
-    "SELECT id FROM estado_pedido WHERE nombre = 'Pagado' LIMIT 1",
-  );
-  const pagadoId = estados[0]?.id;
-  if (!pagadoId) {
-    throw new Error('Falta el estado Pagado en la base de datos');
-  }
-
-  const referencia = `efectivo-${fila.numero}`;
-  const monto = formatearImporte(total);
-
-  await pool.execute<ResultSetHeader>('UPDATE pedido SET estado_id = ? WHERE id = ?', [
-    pagadoId,
-    id,
-  ]);
-  await pool.execute<ResultSetHeader>(
-    `INSERT INTO pago (pedido_id, metodo, monto, referencia, registrado_por)
-     VALUES (?, 'efectivo', ?, ?, ?)`,
-    [id, monto, referencia, cajeroId],
-  );
-  await pool.execute<ResultSetHeader>(
-    `INSERT INTO pedido_estado_historial (pedido_id, estado_anterior_id, estado_nuevo_id, cambiado_por)
-     VALUES (?, (SELECT id FROM estado_pedido WHERE nombre = 'Pendiente' LIMIT 1), ?, ?)`,
-    [id, pagadoId, cajeroId],
-  );
-
-  return {
-    id: fila.id,
-    numero: fila.numero,
-    estado: 'Pagado',
-    total: monto,
-    monto_recibido: formatearImporte(montoRecibido),
-    cambio: formatearImporte(montoRecibido - total),
-    pago: {
-      metodo: 'efectivo',
-      monto,
-      referencia,
-      fecha: formatearFechaHora(new Date()),
-    },
-  };
+  });
 }

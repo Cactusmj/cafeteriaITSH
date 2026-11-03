@@ -1,10 +1,13 @@
 import { randomBytes } from 'node:crypto';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
+import type { PoolConnection } from 'mysql2/promise';
 import { pool } from '../config/db.js';
+import { conTransaccion } from '../config/transacciones.js';
 import { ROL } from '../config/roles.js';
 import { ErrorAplicacion, errorProhibido } from '../utils/errores.js';
 import { anticipacionInsuficiente } from '../utils/fecha.js';
 import { destinoPermitido } from '../config/estados.js';
+import { logger } from '../utils/logger.js';
 import { emitirAvisoListo } from './avisos/avisos.service.js';
 import { obtenerProveedorPago, type ProveedorPago } from './pagos/proveedor-pago.js';
 
@@ -155,6 +158,17 @@ export async function cargarPedido(id: number): Promise<FilaPedido | undefined> 
   return filas[0];
 }
 
+export async function cargarPedidoBloqueado(
+  conexion: PoolConnection,
+  id: number,
+): Promise<FilaPedido | undefined> {
+  const [filas] = await conexion.execute<FilaPedido[]>(
+    `${SQL_PEDIDO} WHERE p.id = ? LIMIT 1 FOR UPDATE`,
+    [id],
+  );
+  return filas[0];
+}
+
 async function cargarDetalle(pedidoId: number): Promise<LineaPedidoRespuesta[]> {
   const [filas] = await pool.execute<FilaDetalle[]>(
     `SELECT pd.menu_dia_id, pl.nombre AS platillo, pd.cantidad,
@@ -175,21 +189,34 @@ async function cargarDetalle(pedidoId: number): Promise<LineaPedidoRespuesta[]> 
   }));
 }
 
-export async function cargarPago(pedidoId: number): Promise<PagoRespuesta | null> {
-  const [filas] = await pool.execute<FilaPago[]>(
-    'SELECT metodo, monto, referencia, fecha FROM pago WHERE pedido_id = ? LIMIT 1',
-    [pedidoId],
-  );
-  const fila = filas[0];
-  if (!fila) {
-    return null;
-  }
+function mapearPago(fila: FilaPago): PagoRespuesta {
   return {
     metodo: fila.metodo,
     monto: formatearImporte(fila.monto),
     referencia: fila.referencia,
     fecha: formatearFechaHora(fila.fecha),
   };
+}
+
+export async function cargarPago(pedidoId: number): Promise<PagoRespuesta | null> {
+  const [filas] = await pool.execute<FilaPago[]>(
+    'SELECT metodo, monto, referencia, fecha FROM pago WHERE pedido_id = ? LIMIT 1',
+    [pedidoId],
+  );
+  const fila = filas[0];
+  return fila ? mapearPago(fila) : null;
+}
+
+export async function cargarPagoCon(
+  conexion: PoolConnection,
+  pedidoId: number,
+): Promise<PagoRespuesta | null> {
+  const [filas] = await conexion.execute<FilaPago[]>(
+    'SELECT metodo, monto, referencia, fecha FROM pago WHERE pedido_id = ? LIMIT 1',
+    [pedidoId],
+  );
+  const fila = filas[0];
+  return fila ? mapearPago(fila) : null;
 }
 
 function mapearPedido(fila: FilaPedido, detalle: LineaPedidoRespuesta[], pago: PagoRespuesta | null): PedidoRespuesta {
@@ -202,6 +229,17 @@ function mapearPedido(fila: FilaPedido, detalle: LineaPedidoRespuesta[], pago: P
     total: formatearImporte(fila.total),
     creado_en: formatearFechaHora(fila.creado_en),
     detalle,
+    pago,
+  };
+}
+
+function confirmacionDePago(fila: FilaPedido, pago: PagoRespuesta): ConfirmacionPago {
+  return {
+    id: fila.id,
+    numero: fila.numero,
+    estado: 'Pagado',
+    total: formatearImporte(fila.total),
+    fecha_recoleccion: fila.fecha_recoleccion ? formatearFechaHora(fila.fecha_recoleccion) : null,
     pago,
   };
 }
@@ -389,16 +427,24 @@ export async function crearPedido(parametros: CrearPedidoParametros): Promise<Pe
   };
 }
 
-async function existeTransicion(desde: string, hacia: string): Promise<boolean> {
-  const [filas] = await pool.execute<RowDataPacket[]>(
-    `SELECT 1 AS valida
+const SQL_TRANSICION = `SELECT 1 AS valida
      FROM transicion_estado te
      INNER JOIN estado_pedido d ON d.id = te.desde_id
      INNER JOIN estado_pedido h ON h.id = te.hacia_id
      WHERE d.nombre = ? AND h.nombre = ?
-     LIMIT 1`,
-    [desde, hacia],
-  );
+     LIMIT 1`;
+
+async function existeTransicion(desde: string, hacia: string): Promise<boolean> {
+  const [filas] = await pool.execute<RowDataPacket[]>(SQL_TRANSICION, [desde, hacia]);
+  return filas.length > 0;
+}
+
+async function existeTransicionCon(
+  conexion: PoolConnection,
+  desde: string,
+  hacia: string,
+): Promise<boolean> {
+  const [filas] = await conexion.execute<RowDataPacket[]>(SQL_TRANSICION, [desde, hacia]);
   return filas.length > 0;
 }
 
@@ -415,42 +461,69 @@ export async function avanzarEstado(
     throw errorProhibido('Tu rol no puede llevar el pedido a ese estado');
   }
 
-  const fila = await cargarPedido(id);
-  if (!fila) {
-    throw new ErrorAplicacion(404, 'PEDIDO_NO_ENCONTRADO', 'Pedido no encontrado');
-  }
-  if (fila.estado === 'Entregado' || fila.estado === 'Cancelado') {
-    throw new ErrorAplicacion(409, 'ESTADO_INVALIDO', 'El pedido ya está cerrado');
-  }
-  if (!(await existeTransicion(fila.estado, destino))) {
-    throw new ErrorAplicacion(409, 'ESTADO_INVALIDO', 'Transición de estado no válida');
+  const cambio = await conTransaccion(async (conexion) => {
+    const fila = await cargarPedidoBloqueado(conexion, id);
+    if (!fila) {
+      throw new ErrorAplicacion(404, 'PEDIDO_NO_ENCONTRADO', 'Pedido no encontrado');
+    }
+    if (fila.estado === 'Entregado' || fila.estado === 'Cancelado') {
+      throw new ErrorAplicacion(409, 'ESTADO_INVALIDO', 'El pedido ya está cerrado');
+    }
+    if (!(await existeTransicionCon(conexion, fila.estado, destino))) {
+      throw new ErrorAplicacion(409, 'ESTADO_INVALIDO', 'Transición de estado no válida');
+    }
+
+    const [estados] = await conexion.execute<RowDataPacket[]>(
+      'SELECT id, nombre FROM estado_pedido WHERE nombre IN (?, ?)',
+      [fila.estado, destino],
+    );
+    const anterior = estados.find((estado) => estado.nombre === fila.estado);
+    const nuevo = estados.find((estado) => estado.nombre === destino);
+    if (!anterior || !nuevo) {
+      throw new Error('Faltan estados en la base de datos');
+    }
+
+    await conexion.execute<ResultSetHeader>('UPDATE pedido SET estado_id = ? WHERE id = ?', [
+      nuevo.id,
+      id,
+    ]);
+    await conexion.execute<ResultSetHeader>(
+      `INSERT INTO pedido_estado_historial (pedido_id, estado_anterior_id, estado_nuevo_id, cambiado_por)
+       VALUES (?, ?, ?, ?)`,
+      [id, anterior.id, nuevo.id, solicitante.id],
+    );
+
+    return {
+      id: fila.id,
+      numero: fila.numero,
+      estado_anterior: fila.estado,
+      estado: destino,
+      usuarioId: fila.usuario_id,
+    };
+  });
+
+  if (destino === 'Listo' && cambio.usuarioId != null) {
+    try {
+      await emitirAvisoListo({
+        pedidoId: cambio.id,
+        usuarioId: cambio.usuarioId,
+        numero: cambio.numero,
+      });
+    } catch (error) {
+      logger.error(
+        `No se pudo registrar el aviso del pedido ${cambio.numero}: ${
+          error instanceof Error ? error.message : 'desconocido'
+        }`,
+      );
+    }
   }
 
-  const [estados] = await pool.execute<RowDataPacket[]>(
-    'SELECT id, nombre FROM estado_pedido WHERE nombre IN (?, ?)',
-    [fila.estado, destino],
-  );
-  const anterior = estados.find((estado) => estado.nombre === fila.estado);
-  const nuevo = estados.find((estado) => estado.nombre === destino);
-  if (!anterior || !nuevo) {
-    throw new Error('Faltan estados en la base de datos');
-  }
-
-  await pool.execute<ResultSetHeader>('UPDATE pedido SET estado_id = ? WHERE id = ?', [
-    nuevo.id,
-    id,
-  ]);
-  await pool.execute<ResultSetHeader>(
-    `INSERT INTO pedido_estado_historial (pedido_id, estado_anterior_id, estado_nuevo_id, cambiado_por)
-     VALUES (?, ?, ?, ?)`,
-    [id, anterior.id, nuevo.id, solicitante.id],
-  );
-
-  if (destino === 'Listo' && fila.usuario_id != null) {
-    await emitirAvisoListo({ pedidoId: id, usuarioId: fila.usuario_id, numero: fila.numero });
-  }
-
-  return { id: fila.id, numero: fila.numero, estado_anterior: fila.estado, estado: destino };
+  return {
+    id: cambio.id,
+    numero: cambio.numero,
+    estado_anterior: cambio.estado_anterior,
+    estado: cambio.estado,
+  };
 }
 
 /**
@@ -476,14 +549,7 @@ export async function pagarPedido(
     if (!pago) {
       throw new Error('El pedido está Pagado pero no tiene registro de pago');
     }
-    return {
-      id: fila.id,
-      numero: fila.numero,
-      estado: 'Pagado',
-      total: formatearImporte(fila.total),
-      fecha_recoleccion: fila.fecha_recoleccion ? formatearFechaHora(fila.fecha_recoleccion) : null,
-      pago,
-    };
+    return confirmacionDePago(fila, pago);
   }
 
   if (fila.estado !== 'Pendiente' || !(await existeTransicion('Pendiente', 'Pagado'))) {
@@ -517,32 +583,60 @@ export async function pagarPedido(
     );
   }
 
-  await pool.execute<ResultSetHeader>('UPDATE pedido SET estado_id = ? WHERE id = ?', [
-    pagadoId,
-    id,
-  ]);
-  await pool.execute<ResultSetHeader>(
-    `INSERT INTO pago (pedido_id, metodo, monto, referencia, registrado_por)
-     VALUES (?, 'online', ?, ?, ?)`,
-    [id, monto, resultado.referencia, usuarioId],
-  );
-  await pool.execute<ResultSetHeader>(
-    `INSERT INTO pedido_estado_historial (pedido_id, estado_anterior_id, estado_nuevo_id, cambiado_por)
-     VALUES (?, (SELECT id FROM estado_pedido WHERE nombre = 'Pendiente' LIMIT 1), ?, ?)`,
-    [id, pagadoId, usuarioId],
-  );
+  return conTransaccion(async (conexion) => {
+    const bloqueada = await cargarPedidoBloqueado(conexion, id);
+    if (!bloqueada) {
+      throw new ErrorAplicacion(404, 'PEDIDO_NO_ENCONTRADO', 'Pedido no encontrado');
+    }
+    if (bloqueada.usuario_id !== usuarioId) {
+      throw errorProhibido('No tienes permiso para pagar este pedido');
+    }
 
-  return {
-    id: fila.id,
-    numero: fila.numero,
-    estado: 'Pagado',
-    total: monto,
-    fecha_recoleccion: fila.fecha_recoleccion ? formatearFechaHora(fila.fecha_recoleccion) : null,
-    pago: {
-      metodo: 'online',
-      monto,
-      referencia: resultado.referencia,
-      fecha: formatearFechaHora(new Date()),
-    },
-  };
+    if (bloqueada.estado === 'Pagado') {
+      const pago = await cargarPagoCon(conexion, id);
+      if (!pago) {
+        throw new Error('El pedido está Pagado pero no tiene registro de pago');
+      }
+      return confirmacionDePago(bloqueada, pago);
+    }
+
+    if (bloqueada.estado !== 'Pendiente') {
+      throw new ErrorAplicacion(
+        409,
+        'ESTADO_INVALIDO',
+        'El pedido no está pendiente de pago',
+      );
+    }
+
+    await conexion.execute<ResultSetHeader>('UPDATE pedido SET estado_id = ? WHERE id = ?', [
+      pagadoId,
+      id,
+    ]);
+    await conexion.execute<ResultSetHeader>(
+      `INSERT INTO pago (pedido_id, metodo, monto, referencia, registrado_por)
+       VALUES (?, 'online', ?, ?, ?)`,
+      [id, monto, resultado.referencia, usuarioId],
+    );
+    await conexion.execute<ResultSetHeader>(
+      `INSERT INTO pedido_estado_historial (pedido_id, estado_anterior_id, estado_nuevo_id, cambiado_por)
+       VALUES (?, (SELECT id FROM estado_pedido WHERE nombre = 'Pendiente' LIMIT 1), ?, ?)`,
+      [id, pagadoId, usuarioId],
+    );
+
+    return {
+      id: bloqueada.id,
+      numero: bloqueada.numero,
+      estado: 'Pagado',
+      total: monto,
+      fecha_recoleccion: bloqueada.fecha_recoleccion
+        ? formatearFechaHora(bloqueada.fecha_recoleccion)
+        : null,
+      pago: {
+        metodo: 'online',
+        monto,
+        referencia: resultado.referencia,
+        fecha: formatearFechaHora(new Date()),
+      },
+    };
+  });
 }

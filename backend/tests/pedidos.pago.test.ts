@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/config/db.js', () => ({
-  pool: { execute: vi.fn() },
+  pool: { execute: vi.fn(), getConnection: vi.fn() },
 }));
 
 import { pool } from '../src/config/db.js';
@@ -9,6 +9,15 @@ import { pagarPedido } from '../src/services/pedidos.service.js';
 import type { ProveedorPago } from '../src/services/pagos/proveedor-pago.js';
 
 const ejecutar = pool.execute as unknown as import('vitest').Mock;
+const obtenerConexion = pool.getConnection as unknown as import('vitest').Mock;
+
+const conexion = {
+  execute: ejecutar,
+  beginTransaction: vi.fn(),
+  commit: vi.fn(),
+  rollback: vi.fn(),
+  release: vi.fn(),
+};
 
 const proveedorAprueba: ProveedorPago = {
   procesarPago: vi.fn().mockResolvedValue({ aprobado: true, referencia: 'sbx-000123' }),
@@ -33,6 +42,12 @@ const filaPendiente = {
 
 beforeEach(() => {
   ejecutar.mockReset();
+  obtenerConexion.mockReset();
+  conexion.beginTransaction.mockReset();
+  conexion.commit.mockReset();
+  conexion.rollback.mockReset();
+  conexion.release.mockReset();
+  obtenerConexion.mockResolvedValue(conexion);
   vi.mocked(proveedorAprueba.procesarPago).mockClear();
   vi.mocked(proveedorRechaza.procesarPago).mockClear();
 });
@@ -43,6 +58,7 @@ describe('pedidos.service.pagarPedido', () => {
       .mockResolvedValueOnce([[filaPendiente], []]) // pedido
       .mockResolvedValueOnce([[{ valida: 1 }], []]) // transición Pendiente → Pagado
       .mockResolvedValueOnce([[{ id: 2 }], []]) // estado Pagado
+      .mockResolvedValueOnce([[filaPendiente], []]) // pedido bloqueado
       .mockResolvedValueOnce([{ affectedRows: 1 }, []]) // UPDATE pedido
       .mockResolvedValueOnce([{ insertId: 1 }, []]) // INSERT pago
       .mockResolvedValueOnce([{ insertId: 2 }, []]); // historial
@@ -60,7 +76,53 @@ describe('pedidos.service.pagarPedido', () => {
       monto: '95.00',
       idempotencia: expect.any(String) as string,
     });
-    expect(ejecutar).toHaveBeenCalledTimes(6);
+    expect(ejecutar).toHaveBeenCalledTimes(7);
+    expect(conexion.commit).toHaveBeenCalled();
+  });
+
+  it('no duplica el pago si otra petición concurrente ya lo confirmó', async () => {
+    ejecutar
+      .mockResolvedValueOnce([[filaPendiente], []]) // lectura inicial
+      .mockResolvedValueOnce([[{ valida: 1 }], []]) // transición
+      .mockResolvedValueOnce([[{ id: 2 }], []]) // estado Pagado
+      .mockResolvedValueOnce([[{ ...filaPendiente, estado: 'Pagado' }], []]) // bloqueo
+      .mockResolvedValueOnce([
+        [
+          {
+            metodo: 'online',
+            monto: '95.00',
+            referencia: 'sbx-000123',
+            fecha: new Date(2026, 10, 10, 12, 31),
+          },
+        ],
+        [],
+      ]);
+
+    const resultado = await pagarPedido(3, 7, proveedorAprueba);
+
+    expect(resultado.estado).toBe('Pagado');
+    expect(resultado.pago.referencia).toBe('sbx-000123');
+    expect(ejecutar).toHaveBeenCalledTimes(5);
+    const escrituras = ejecutar.mock.calls.filter(([sql]) =>
+      /^(UPDATE pedido|INSERT INTO pago|INSERT INTO pedido_estado_historial)/.test(String(sql)),
+    );
+    expect(escrituras).toHaveLength(0);
+    expect(conexion.commit).toHaveBeenCalled();
+  });
+
+  it('hace rollback si falla una escritura del pago', async () => {
+    const error = new Error('fallo al insertar el pago');
+    ejecutar
+      .mockResolvedValueOnce([[filaPendiente], []])
+      .mockResolvedValueOnce([[{ valida: 1 }], []])
+      .mockResolvedValueOnce([[{ id: 2 }], []])
+      .mockResolvedValueOnce([[filaPendiente], []])
+      .mockResolvedValueOnce([{ affectedRows: 1 }, []])
+      .mockRejectedValueOnce(error);
+
+    await expect(pagarPedido(3, 7, proveedorAprueba)).rejects.toBe(error);
+    expect(conexion.rollback).toHaveBeenCalled();
+    expect(conexion.commit).not.toHaveBeenCalled();
   });
 
   it('rechaza PAGO_RECHAZADO dejando el pedido Pendiente', async () => {
