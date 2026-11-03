@@ -1,5 +1,21 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import {
+  CalendarClock,
+  ChefHat,
+  ClipboardList,
+  Coffee,
+  Home,
+  LogOut,
+  Menu as IconoMenu,
+  PackageCheck,
+  ReceiptText,
+  ShoppingBasket,
+  Users,
+  UtensilsCrossed,
+  X,
+  type LucideIcon,
+} from 'lucide-react'
 import { api } from '../../lib/api'
 import { useSesion } from '../../lib/useSesion'
 import { INICIO_POR_ROL, type Rol } from '../../lib/sesion'
@@ -7,23 +23,24 @@ import { INICIO_POR_ROL, type Rol } from '../../lib/sesion'
 interface Enlace {
   etiqueta: string
   ruta: string
+  icono: LucideIcon
 }
 
 const NAVEGACION: Record<Rol, Enlace[]> = {
   administrador: [
-    { etiqueta: 'Inicio', ruta: '/admin' },
-    { etiqueta: 'Usuarios', ruta: '/admin/usuarios' },
-    { etiqueta: 'Platillos', ruta: '/admin/platillos' },
-    { etiqueta: 'Menú del día', ruta: '/admin/menu' },
+    { etiqueta: 'Inicio', ruta: '/admin', icono: Home },
+    { etiqueta: 'Usuarios', ruta: '/admin/usuarios', icono: Users },
+    { etiqueta: 'Platillos', ruta: '/admin/platillos', icono: UtensilsCrossed },
+    { etiqueta: 'Menú del día', ruta: '/admin/menu', icono: CalendarClock },
   ],
   cajero: [
-    { etiqueta: 'Caja', ruta: '/caja' },
-    { etiqueta: 'Entregas', ruta: '/caja/entregas' },
+    { etiqueta: 'Caja', ruta: '/caja', icono: ReceiptText },
+    { etiqueta: 'Entregas', ruta: '/caja/entregas', icono: PackageCheck },
   ],
-  cocinero: [{ etiqueta: 'Cocina', ruta: '/cocina' }],
+  cocinero: [{ etiqueta: 'Cocina', ruta: '/cocina', icono: ChefHat }],
   usuario: [
-    { etiqueta: 'Menú', ruta: '/menu' },
-    { etiqueta: 'Mis pedidos', ruta: '/mis-pedidos' },
+    { etiqueta: 'Menú', ruta: '/menu', icono: ShoppingBasket },
+    { etiqueta: 'Mis pedidos', ruta: '/mis-pedidos', icono: ClipboardList },
   ],
 }
 
@@ -31,14 +48,14 @@ const NAVEGACION: Record<Rol, Enlace[]> = {
 const CON_BARRA: Rol[] = ['usuario', 'cajero']
 
 const claseEnlace = ({ isActive }: { isActive: boolean }): string =>
-  `inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-medium ${
+  `inline-flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
     isActive
       ? 'bg-primary-container font-semibold text-on-primary-container'
       : 'text-on-surface-variant hover:bg-surface-container'
   }`
 
 const clasePestana = ({ isActive }: { isActive: boolean }): string =>
-  `flex min-h-11 flex-1 items-center justify-center gap-1 px-2 py-2 text-sm font-medium ${
+  `flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 px-2 py-1.5 text-xs font-medium transition-colors ${
     isActive ? 'font-semibold text-primary' : 'text-on-surface-variant'
   }`
 
@@ -125,8 +142,10 @@ export function LayoutPorRol() {
     <>
       {enlaces.map((enlace) => {
         const contador = contadorDe(enlace.ruta)
+        const Icono = enlace.icono
         return (
           <NavLink key={enlace.ruta} to={enlace.ruta} onClick={alPulsar} className={claseEnlace}>
+            <Icono aria-hidden="true" className="size-5 shrink-0" strokeWidth={2.2} />
             {enlace.etiqueta}
             {contador && <InsigniaContador conteo={contador.conteo} etiqueta={contador.etiqueta} />}
           </NavLink>
@@ -152,8 +171,8 @@ export function LayoutPorRol() {
           abierto ? 'translate-x-0' : ''
         }`}
       >
-        <div className="flex items-center gap-3 border-b border-outline-variant px-2 pb-4">
-          <span aria-hidden="true" className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-primary-container font-heading text-lg font-bold text-on-primary-container">
+        <div className="flex items-center gap-3 border-b border-outline-variant bg-gradient-to-br from-primary-container/60 to-secondary-container/60 px-2 pb-4">
+          <span aria-hidden="true" className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-primary font-heading text-lg font-bold text-on-primary shadow-sm ring-2 ring-primary-container">
             {usuario.nombre.charAt(0).toUpperCase()}
           </span>
           <div className="min-w-0">
@@ -168,15 +187,16 @@ export function LayoutPorRol() {
           <button
             type="button"
             onClick={salir}
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-on-primary hover:brightness-110"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-on-primary transition-all hover:brightness-110 active:scale-[0.98]"
           >
+            <LogOut aria-hidden="true" className="size-4" strokeWidth={2.2} />
             Cerrar sesión
           </button>
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-outline-variant bg-surface-container-lowest px-4 py-3">
+        <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-outline-variant bg-surface-container-lowest/95 px-4 py-3 backdrop-blur">
           <button
             type="button"
             onClick={() => setAbierto((valor) => !valor)}
@@ -184,14 +204,19 @@ export function LayoutPorRol() {
             aria-label={abierto ? 'Cerrar menú' : 'Abrir menú'}
             className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-on-surface hover:bg-surface-container md:hidden"
           >
-            <span aria-hidden="true" className="text-xl">
-              ☰
-            </span>
+            {abierto ? (
+              <X aria-hidden="true" className="size-6" strokeWidth={2.2} />
+            ) : (
+              <IconoMenu aria-hidden="true" className="size-6" strokeWidth={2.2} />
+            )}
           </button>
           <Link
             to={INICIO_POR_ROL[usuario.rol]}
-            className="font-heading text-lg font-bold text-on-surface"
+            className="flex items-center gap-2 font-heading text-lg font-bold text-on-surface"
           >
+            <span aria-hidden="true" className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-xl bg-primary text-on-primary">
+              <Coffee className="size-5" strokeWidth={2.2} />
+            </span>
             Cafetería ITSH
           </Link>
         </header>
@@ -207,12 +232,18 @@ export function LayoutPorRol() {
           >
             {enlaces.map((enlace) => {
               const contador = contadorDe(enlace.ruta)
+              const Icono = enlace.icono
               return (
                 <NavLink key={enlace.ruta} to={enlace.ruta} className={clasePestana}>
+                  <span className="relative inline-flex">
+                    <Icono aria-hidden="true" className="size-5" strokeWidth={2.2} />
+                    {contador && contador.conteo > 0 && (
+                      <span className="absolute -right-2 -top-1.5 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-on-primary">
+                        {contador.conteo}
+                      </span>
+                    )}
+                  </span>
                   {enlace.etiqueta}
-                  {contador && (
-                    <InsigniaContador conteo={contador.conteo} etiqueta={contador.etiqueta} />
-                  )}
                 </NavLink>
               )
             })}

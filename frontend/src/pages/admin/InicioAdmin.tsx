@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ArrowRight, CalendarClock, LayoutDashboard, UtensilsCrossed, Users } from 'lucide-react'
 import { InsigniaEspecial } from '../../components/ui/InsigniaEspecial'
+import { EncabezadoPagina } from '../../components/ui/EncabezadoPagina'
 import { EstadoVacio } from '../../components/ui/EstadoVacio'
 import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
@@ -52,19 +54,18 @@ export function InicioAdmin() {
   }
 
   const accesos = [
-    { etiqueta: 'Usuarios', ruta: '/admin/usuarios', conteo: `${conteos.usuarios} activos` },
-    { etiqueta: 'Platillos', ruta: '/admin/platillos', conteo: `${conteos.platillos} en catálogo` },
-    { etiqueta: 'Menú del día', ruta: '/admin/menu', conteo: `${conteos.menu} publicados hoy` },
+    { etiqueta: 'Usuarios', ruta: '/admin/usuarios', conteo: `${conteos.usuarios} activos`, icono: Users },
+    { etiqueta: 'Platillos', ruta: '/admin/platillos', conteo: `${conteos.platillos} en catálogo`, icono: UtensilsCrossed },
+    { etiqueta: 'Menú del día', ruta: '/admin/menu', conteo: `${conteos.menu} publicados hoy`, icono: CalendarClock },
   ]
 
   return (
     <section className="flex flex-col gap-4">
-      <div>
-        <h1 className="font-heading text-2xl font-bold text-on-surface">Inicio</h1>
-        <p className="text-sm text-on-surface-variant">
-          Hola{usuario ? `, ${usuario.nombre}` : ''} · Panel de administración de la cafetería.
-        </p>
-      </div>
+      <EncabezadoPagina
+        icono={LayoutDashboard}
+        titulo="Inicio"
+        descripcion={`Hola${usuario ? `, ${usuario.nombre}` : ''} · Panel de administración de la cafetería.`}
+      />
 
       {error && (
         <EstadoVacio titulo="No se pudo cargar el resumen" descripcion={error} onReintentar={refrescar} />
@@ -75,18 +76,30 @@ export function InicioAdmin() {
       ) : (
         <>
           <div className="grid gap-3 sm:grid-cols-3">
-            {accesos.map((acceso) => (
-              <Link key={acceso.ruta} to={acceso.ruta}>
-                <Tarjeta className="p-4 transition-shadow hover:shadow">
-                  <p className="font-heading text-base font-bold text-primary">{acceso.etiqueta}</p>
-                  <p className="mt-1 text-sm text-on-surface-variant">{acceso.conteo}</p>
-                </Tarjeta>
-              </Link>
-            ))}
+            {accesos.map((acceso) => {
+              const Icono = acceso.icono
+              return (
+                <Link key={acceso.ruta} to={acceso.ruta} className="group">
+                  <Tarjeta className="p-4 transition-all group-hover:-translate-y-0.5">
+                    <span aria-hidden="true" className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-primary-container text-on-primary-container">
+                      <Icono className="size-5" strokeWidth={2.2} />
+                    </span>
+                    <p className="mt-2 flex items-center gap-1 font-heading text-base font-bold text-primary">
+                      {acceso.etiqueta}
+                      <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5" />
+                    </p>
+                    <p className="mt-1 text-sm text-on-surface-variant">{acceso.conteo}</p>
+                  </Tarjeta>
+                </Link>
+              )
+            })}
           </div>
 
           <Tarjeta className="p-4">
-            <h2 className="font-heading text-lg font-bold text-on-surface">Menú de hoy</h2>
+            <h2 className="flex items-center gap-2 font-heading text-lg font-bold text-on-surface">
+              <CalendarClock aria-hidden="true" className="size-5 text-primary" />
+              Menú de hoy
+            </h2>
             {resumen.length === 0 ? (
               <p className="mt-2 text-sm text-on-surface-variant">
                 No hay menú publicado hoy. Publícalo desde Menú del día.

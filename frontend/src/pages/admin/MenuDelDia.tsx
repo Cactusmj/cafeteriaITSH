@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { CalendarClock, Plus, Trash2 } from 'lucide-react'
 import { Boton } from '../../components/ui/Boton'
 import { Campo } from '../../components/ui/Campo'
+import { EncabezadoPagina } from '../../components/ui/EncabezadoPagina'
 import { EstadoVacio } from '../../components/ui/EstadoVacio'
 import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
@@ -112,10 +114,11 @@ export function MenuDelDia() {
 
   return (
     <section className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-heading text-2xl font-bold text-on-surface">Menú del día</h1>
-        {fecha && <p className="text-sm text-on-surface-variant">Fecha: {fecha}</p>}
-      </div>
+      <EncabezadoPagina
+        icono={CalendarClock}
+        titulo="Menú del día"
+        descripcion={fecha ? `Publicado para hoy · ${fecha}` : 'Arma el menú que verán los clientes'}
+      />
 
       {error && (
         <EstadoVacio titulo="No se pudo cargar el menú del día" descripcion={error} onReintentar={refrescar} />
@@ -123,7 +126,10 @@ export function MenuDelDia() {
 
       <Tarjeta className="p-4">
         <form onSubmit={agregar} className="grid gap-3 sm:grid-cols-3">
-          <h2 className="font-heading text-lg font-bold text-on-surface sm:col-span-3">Agregar platillo al menú</h2>
+          <h2 className="flex items-center gap-2 font-heading text-lg font-bold text-on-surface sm:col-span-3">
+            <Plus aria-hidden="true" className="size-5 text-primary" />
+            Agregar platillo al menú
+          </h2>
           <label className="flex flex-col gap-1 text-sm font-medium text-on-surface-variant">
             <span>Platillo</span>
             <select
@@ -160,6 +166,7 @@ export function MenuDelDia() {
           </label>
           <div className="sm:col-span-3">
             <Boton type="submit" disabled={agregando}>
+              <Plus aria-hidden="true" className="size-4" strokeWidth={2.4} />
               {agregando ? 'Agregando…' : 'Agregar al menú'}
             </Boton>
           </div>
@@ -233,6 +240,7 @@ export function MenuDelDia() {
                       variante="secundario"
                       onClick={() => void eliminar(entrada.id)}
                     >
+                      <Trash2 aria-hidden="true" className="size-4" />
                       Quitar del menú
                     </Boton>
                   </td>

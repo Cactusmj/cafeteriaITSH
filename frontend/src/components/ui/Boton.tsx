@@ -6,7 +6,7 @@ interface BotonPropiedades extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const claseBase =
-  'inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-60'
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all active:scale-[0.98] disabled:opacity-60 disabled:active:scale-100'
 
 const clasePorVariante: Record<'primario' | 'secundario', string> = {
   primario: 'bg-primary text-on-primary hover:brightness-110',

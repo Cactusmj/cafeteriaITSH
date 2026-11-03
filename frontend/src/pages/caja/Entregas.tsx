@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
+import { CircleX, HandPlatter, PackageCheck, RefreshCw, Wallet } from 'lucide-react'
 import { BadgeEstado } from '../../components/pedidos/BadgeEstado'
 import { Boton } from '../../components/ui/Boton'
+import { EncabezadoPagina } from '../../components/ui/EncabezadoPagina'
 import { EstadoVacio } from '../../components/ui/EstadoVacio'
 import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
@@ -87,14 +89,19 @@ export function Entregas() {
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl font-bold text-on-surface">Entregas</h1>
-        {pendientes.length > 0 && (
-          <span className="rounded-full bg-surface-container px-3 py-1 text-xs font-semibold text-on-surface-variant">
-            {pendientes.length} {pendientes.length === 1 ? 'pendiente' : 'pendientes'}
-          </span>
-        )}
-      </div>
+      <EncabezadoPagina
+        icono={PackageCheck}
+        titulo="Entregas"
+        descripcion="Pedidos listos por entregar, por orden de llegada"
+        accion={
+          pendientes.length > 0 ? (
+            <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary-container px-3 py-1 text-xs font-semibold text-on-primary-container">
+              <HandPlatter aria-hidden="true" className="size-4" />
+              {pendientes.length} {pendientes.length === 1 ? 'pendiente' : 'pendientes'}
+            </span>
+          ) : undefined
+        }
+      />
 
       {mensaje && (
         <p role="alert" className="rounded-lg bg-error-container px-3 py-2 text-sm text-on-error-container">
@@ -108,6 +115,7 @@ export function Entregas() {
         <EstadoVacio
           titulo="¡Todo está al día!"
           descripcion="No hay pedidos listos por entregar."
+          icono={PackageCheck}
           onReintentar={refrescar}
         />
       ) : (
@@ -131,6 +139,7 @@ export function Entregas() {
                       onClick={() => void cobrarPendiente(pendiente)}
                       disabled={accion === pendiente.id}
                     >
+                      <Wallet aria-hidden="true" className="size-4" />
                       Cobrar ${pendiente.total}
                     </Boton>
                   )}
@@ -139,6 +148,7 @@ export function Entregas() {
                       onClick={() => void cambiarEstado(pendiente.id, 'Entregado')}
                       disabled={accion === pendiente.id}
                     >
+                      <HandPlatter aria-hidden="true" className="size-4" />
                       Entregar
                     </Boton>
                   )}
@@ -148,6 +158,7 @@ export function Entregas() {
                       onClick={() => void cambiarEstado(pendiente.id, 'Cancelado')}
                       disabled={accion === pendiente.id}
                     >
+                      <CircleX aria-hidden="true" className="size-4" />
                       Cancelar
                     </Boton>
                   )}
@@ -160,6 +171,7 @@ export function Entregas() {
 
       <div>
         <Boton variante="secundario" onClick={refrescar} disabled={cargando}>
+          <RefreshCw aria-hidden="true" className={`size-4 ${cargando ? 'animate-spin' : ''}`} />
           {cargando ? 'Actualizando…' : 'Actualizar'}
         </Boton>
       </div>

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { Power, UserPlus, Users } from 'lucide-react'
 import { Boton } from '../../components/ui/Boton'
 import { Campo } from '../../components/ui/Campo'
+import { EncabezadoPagina } from '../../components/ui/EncabezadoPagina'
 import { EstadoVacio } from '../../components/ui/EstadoVacio'
 import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
@@ -102,7 +104,11 @@ export function Usuarios() {
 
   return (
     <section className="flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-bold text-on-surface">Gestión de usuarios</h1>
+      <EncabezadoPagina
+        icono={Users}
+        titulo="Gestión de usuarios"
+        descripcion="Cuentas operativas de caja y cocina"
+      />
 
       {error && (
         <p role="alert" className="rounded-lg bg-error-container px-3 py-2 text-sm text-on-error-container">
@@ -112,7 +118,10 @@ export function Usuarios() {
 
       <Tarjeta className="p-4">
         <form onSubmit={crear} className="grid gap-3 sm:grid-cols-2">
-          <h2 className="font-heading text-lg font-bold text-on-surface sm:col-span-2">Nueva cuenta operativa</h2>
+          <h2 className="flex items-center gap-2 font-heading text-lg font-bold text-on-surface sm:col-span-2">
+            <UserPlus aria-hidden="true" className="size-5 text-primary" />
+            Nueva cuenta operativa
+          </h2>
           <Campo etiqueta="Nombre" type="text" required value={nombre} onChange={(e) => setNombre(e.target.value)} />
           <Campo etiqueta="Correo" type="email" required value={correo} onChange={(e) => setCorreo(e.target.value)} />
           <Campo etiqueta="Contraseña" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -129,6 +138,7 @@ export function Usuarios() {
           </label>
           <div className="sm:col-span-2">
             <Boton type="submit" disabled={creando}>
+              <UserPlus aria-hidden="true" className="size-4" />
               {creando ? 'Creando…' : 'Crear usuario'}
             </Boton>
           </div>
@@ -182,6 +192,7 @@ export function Usuarios() {
                       variante="secundario"
                       onClick={() => void cambiarEstado(usuario)}
                     >
+                      <Power aria-hidden="true" className="size-4" />
                       {usuario.activo ? 'Deshabilitar' : 'Habilitar'}
                     </Boton>
                   </td>

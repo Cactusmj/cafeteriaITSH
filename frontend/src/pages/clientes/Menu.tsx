@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { LayoutGrid, RefreshCw, SearchX, ShoppingBasket, UtensilsCrossed } from 'lucide-react'
 import { TarjetaPlatillo } from '../../components/menu/TarjetaPlatillo'
 import { Boton } from '../../components/ui/Boton'
 import { Campo } from '../../components/ui/Campo'
+import { EncabezadoPagina } from '../../components/ui/EncabezadoPagina'
 import { EstadoVacio } from '../../components/ui/EstadoVacio'
+import { IconoCategoria } from '../../components/ui/iconos'
 import { api, ErrorPeticion } from '../../lib/api'
 import {
   guardarCarrito,
@@ -25,9 +28,9 @@ interface PlatilloMenu {
 }
 
 const claseChip = (activa: boolean): string =>
-  `inline-flex min-h-11 items-center rounded-full px-4 text-sm font-medium ${
+  `inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-medium transition-all ${
     activa
-      ? 'bg-primary font-semibold text-on-primary'
+      ? 'bg-primary font-semibold text-on-primary shadow-sm'
       : 'border border-outline bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container'
   }`
 
@@ -143,15 +146,17 @@ export function Menu() {
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-heading text-2xl font-bold text-on-surface">Menú del día</h1>
-          {fecha && <p className="text-sm text-on-surface-variant">Fecha: {fecha}</p>}
-        </div>
-        <Boton variante="secundario" onClick={() => void refrescar()} disabled={cargando}>
-          {cargando ? 'Actualizando…' : 'Actualizar'}
-        </Boton>
-      </div>
+      <EncabezadoPagina
+        icono={UtensilsCrossed}
+        titulo="Menú del día"
+        descripcion={fecha ? `Publicado para hoy · ${fecha}` : 'Sabores caseros de la cafetería'}
+        accion={
+          <Boton variante="secundario" onClick={() => void refrescar()} disabled={cargando}>
+            <RefreshCw aria-hidden="true" className={`size-4 ${cargando ? 'animate-spin' : ''}`} />
+            {cargando ? 'Actualizando…' : 'Actualizar'}
+          </Boton>
+        }
+      />
 
       <Campo
         etiqueta="Buscar producto"
@@ -168,19 +173,23 @@ export function Menu() {
             onClick={() => setCategoria(null)}
             className={claseChip(categoria === null)}
           >
+            <LayoutGrid aria-hidden="true" className="size-4" />
             Todos
           </button>
-          {categoriasOrdenadas.map((clave) => (
-            <button
-              key={clave}
-              type="button"
-              aria-pressed={categoria === clave}
-              onClick={() => setCategoria(clave)}
-              className={claseChip(categoria === clave)}
-            >
-              {etiquetaCategoria(clave)}
-            </button>
-          ))}
+          {categoriasOrdenadas.map((clave) => {
+            return (
+              <button
+                key={clave}
+                type="button"
+                aria-pressed={categoria === clave}
+                onClick={() => setCategoria(clave)}
+                className={claseChip(categoria === clave)}
+              >
+                <IconoCategoria categoria={clave === 'sin categoria' ? null : clave} className="size-4" />
+                {etiquetaCategoria(clave)}
+              </button>
+            )
+          })}
         </div>
       )}
 
@@ -189,46 +198,60 @@ export function Menu() {
       ) : error && platillos.length === 0 ? (
         <EstadoVacio titulo="No se pudo cargar el menú" descripcion={error} onReintentar={() => void refrescar()} />
       ) : platillos.length === 0 ? (
-        <EstadoVacio titulo="Menú no disponible hoy" descripcion="No hay menú publicado por hoy. Vuelve más tarde." />
+        <EstadoVacio titulo="Menú no disponible hoy" descripcion="No hay menú publicado por hoy. Vuelve más tarde." icono={UtensilsCrossed} />
       ) : filtrados.length === 0 ? (
         <EstadoVacio
           titulo={textoBusqueda ? `Sin resultados para ‘${busqueda.trim()}’` : 'Sin resultados en esta categoría'}
           descripcion="Prueba otra búsqueda o categoría."
+          icono={SearchX}
         />
       ) : (
         Object.keys(grupos)
           .sort((a, b) => a.localeCompare(b, 'es'))
-          .map((clave) => (
-            <div key={clave} className="flex flex-col gap-3">
-              <h2 className="font-heading text-lg font-bold text-on-surface">
-                {etiquetaCategoria(clave)}
-              </h2>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {grupos[clave].map((platillo) => (
-                  <TarjetaPlatillo
-                    key={platillo.id}
-                    platillo={platillo.platillo}
-                    categoria={platillo.categoria}
-                    descripcion={platillo.descripcion}
-                    precio={platillo.precio}
-                    disponible={platillo.disponible}
-                    especial={platillo.especial}
-                    cantidad={carrito.find((linea) => linea.menu_dia_id === platillo.id)?.cantidad ?? 0}
-                    onAgregar={() => agregarAlCarrito(platillo)}
-                    onQuitar={() => quitarDelCarrito(platillo)}
-                  />
-                ))}
+          .map((clave) => {
+            return (
+              <div key={clave} className="flex flex-col gap-3">
+                <h2 className="flex items-center gap-2 font-heading text-lg font-bold text-on-surface">
+                  <span aria-hidden="true" className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-xl bg-secondary-container text-on-secondary-container">
+                    <IconoCategoria categoria={clave === 'sin categoria' ? null : clave} className="size-5" />
+                  </span>
+                  {etiquetaCategoria(clave)}
+                  <span className="rounded-full bg-surface-container px-2.5 py-0.5 text-xs font-semibold text-on-surface-variant">
+                    {grupos[clave].length}
+                  </span>
+                </h2>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {grupos[clave].map((platillo) => (
+                    <TarjetaPlatillo
+                      key={platillo.id}
+                      platillo={platillo.platillo}
+                      categoria={platillo.categoria}
+                      descripcion={platillo.descripcion}
+                      precio={platillo.precio}
+                      disponible={platillo.disponible}
+                      especial={platillo.especial}
+                      cantidad={carrito.find((linea) => linea.menu_dia_id === platillo.id)?.cantidad ?? 0}
+                      onAgregar={() => agregarAlCarrito(platillo)}
+                      onQuitar={() => quitarDelCarrito(platillo)}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))
+            )
+          })
       )}
 
       {unidades > 0 && (
-        <div className="sticky bottom-20 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 shadow md:bottom-4">
-          <p className="text-sm text-on-surface">
-            <span className="font-heading font-bold">{unidades}</span>{' '}
-            {unidades === 1 ? 'producto' : 'productos'} ·{' '}
-            <span className="font-heading font-bold text-primary">${totalCarrito(carrito)}</span>
+        <div className="sticky bottom-20 z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-surface-container-lowest px-4 py-3 shadow-lg md:bottom-4">
+          <p className="flex items-center gap-2 text-sm text-on-surface">
+            <span aria-hidden="true" className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full bg-primary text-on-primary">
+              <ShoppingBasket className="size-5" strokeWidth={2.2} />
+            </span>
+            <span>
+              <span className="font-heading font-bold">{unidades}</span>{' '}
+              {unidades === 1 ? 'producto' : 'productos'} ·{' '}
+              <span className="font-heading font-bold text-primary">${totalCarrito(carrito)}</span>
+            </span>
           </p>
           <Boton onClick={() => navegar('/confirmar-pedido')}>Ver pedido</Boton>
         </div>

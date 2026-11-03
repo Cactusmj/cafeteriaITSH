@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { BellRing, ClipboardList, Eye, Plus, ReceiptText } from 'lucide-react'
 import { BadgeEstado } from '../../components/pedidos/BadgeEstado'
 import { Boton } from '../../components/ui/Boton'
+import { EncabezadoPagina } from '../../components/ui/EncabezadoPagina'
 import { EstadoVacio } from '../../components/ui/EstadoVacio'
 import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
@@ -114,14 +116,19 @@ export function MisPedidos() {
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl font-bold text-on-surface">Mis pedidos</h1>
-        {pedidos.length > 0 && (
-          <span className="rounded-full bg-surface-container px-3 py-1 text-xs font-semibold text-on-surface-variant">
-            {activos === 0 ? 'Sin pedidos activos' : `${activos} ${activos === 1 ? 'activo' : 'activos'}`}
-          </span>
-        )}
-      </div>
+      <EncabezadoPagina
+        icono={ClipboardList}
+        titulo="Mis pedidos"
+        descripcion={pedidos.length > 0 ? 'Sigue el avance de tus pedidos' : 'Tus pedidos aparecerán aquí'}
+        accion={
+          pedidos.length > 0 ? (
+            <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-surface-container px-3 py-1 text-xs font-semibold text-on-surface-variant">
+              <ReceiptText aria-hidden="true" className="size-4" />
+              {activos === 0 ? 'Sin pedidos activos' : `${activos} ${activos === 1 ? 'activo' : 'activos'}`}
+            </span>
+          ) : undefined
+        }
+      />
 
       {error && (
         <EstadoVacio titulo="No se pudieron cargar tus pedidos" descripcion={error} onReintentar={refrescar} />
@@ -129,7 +136,10 @@ export function MisPedidos() {
 
       {pendientes.length > 0 && (
         <div className="rounded-xl border-2 border-status-ready bg-surface-container-lowest p-4 shadow-sm">
-          <p className="font-heading text-base font-bold text-on-surface">
+          <p className="flex items-center gap-2 font-heading text-base font-bold text-on-surface">
+            <span aria-hidden="true" className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full bg-status-ready text-white">
+              <BellRing className="size-5" strokeWidth={2.2} />
+            </span>
             ¡Listo para recoger! Tienes{' '}
             {pendientes.length === 1 ? 'un pedido listo' : `${pendientes.length} pedidos listos`}
           </p>
@@ -153,9 +163,13 @@ export function MisPedidos() {
           <EstadoVacio
             titulo="Aún no tienes pedidos"
             descripcion="Explora el menú del día para hacer el primero."
+            icono={ClipboardList}
           />
           <div>
-            <Boton onClick={() => navegar('/menu')}>Nuevo pedido</Boton>
+            <Boton onClick={() => navegar('/menu')}>
+              <Plus aria-hidden="true" className="size-4" strokeWidth={2.4} />
+              Nuevo pedido
+            </Boton>
           </div>
         </>
       ) : (
@@ -180,8 +194,9 @@ export function MisPedidos() {
                   <button
                     type="button"
                     onClick={() => void verDetalle(pedido.id)}
-                    className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-primary underline"
+                    className="mt-2 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-primary underline"
                   >
+                    <Eye aria-hidden="true" className="size-4" />
                     Ver detalle
                   </button>
                   {detalle?.id === pedido.id && (

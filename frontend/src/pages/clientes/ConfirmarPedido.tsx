@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ArrowLeft, BadgeCheck, Clock3, CreditCard, ReceiptText, ShoppingBasket, Trash2 } from 'lucide-react'
 import { BadgeEstado } from '../../components/pedidos/BadgeEstado'
 import { Boton } from '../../components/ui/Boton'
+import { EncabezadoPagina } from '../../components/ui/EncabezadoPagina'
 import { EstadoVacio } from '../../components/ui/EstadoVacio'
 import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
@@ -165,10 +167,11 @@ export function ConfirmarPedido() {
   if (!pedido && lineas.length === 0) {
     return (
       <section className="flex flex-col gap-4">
-        <h1 className="font-heading text-2xl font-bold text-on-surface">Confirmar pedido</h1>
+        <EncabezadoPagina icono={ShoppingBasket} titulo="Confirmar pedido" descripcion="Revisa y paga tu pedido anticipado" />
         <EstadoVacio
           titulo="Tu carrito está vacío"
           descripcion="Elige platillos del menú para continuar."
+          icono={ShoppingBasket}
         />
         <div>
           <Boton onClick={() => navegar('/menu')}>Volver al menú</Boton>
@@ -181,9 +184,11 @@ export function ConfirmarPedido() {
     const pagado = pedido.estado === 'Pagado'
     return (
       <section className="flex flex-col gap-4">
-        <h1 className="font-heading text-2xl font-bold text-on-surface">
-          {pagado ? 'Confirmación de pedido' : 'Pagar pedido'}
-        </h1>
+        <EncabezadoPagina
+          icono={pagado ? BadgeCheck : CreditCard}
+          titulo={pagado ? 'Confirmación de pedido' : 'Pagar pedido'}
+          descripcion={pagado ? 'Tu pedido ya está en la cocina' : 'Solo falta completar el pago'}
+        />
 
         <Tarjeta className="p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -248,13 +253,18 @@ export function ConfirmarPedido() {
     <section className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <Boton variante="secundario" onClick={() => navegar('/menu')}>
+          <ArrowLeft aria-hidden="true" className="size-4" />
           Regresar
         </Boton>
         <h1 className="font-heading text-2xl font-bold text-on-surface">Revisa tu pedido</h1>
       </div>
 
       <Tarjeta className="p-4">
-        <ul className="flex flex-col gap-2">
+        <p className="flex items-center gap-2 text-sm font-semibold text-on-surface">
+          <ReceiptText aria-hidden="true" className="size-4 text-primary" />
+          Tu selección
+        </p>
+        <ul className="mt-2 flex flex-col gap-2">
           {lineas.map((linea) => (
             <li key={linea.menu_dia_id} className="flex items-center justify-between gap-3">
               <div>
@@ -275,7 +285,8 @@ export function ConfirmarPedido() {
       </Tarjeta>
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="horario" className="text-sm font-medium text-on-surface-variant">
+        <label htmlFor="horario" className="flex items-center gap-1.5 text-sm font-medium text-on-surface-variant">
+          <Clock3 aria-hidden="true" className="size-4" />
           Hora de recolección
         </label>
         <select
@@ -317,6 +328,7 @@ export function ConfirmarPedido() {
         disabled={creando || slots.length === 0}
         className="min-h-12 w-full text-base"
       >
+        <CreditCard aria-hidden="true" className="size-5" />
         {creando ? 'Creando pedido…' : 'Continuar al pago'}
       </Boton>
       <p className="text-center text-xs text-on-surface-variant">
@@ -331,8 +343,9 @@ export function ConfirmarPedido() {
           setLineas([])
           navegar('/menu')
         }}
-        className="self-start text-sm font-medium text-error underline"
+        className="inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-medium text-error underline"
       >
+        <Trash2 aria-hidden="true" className="size-4" />
         Vaciar carrito
       </button>
     </section>

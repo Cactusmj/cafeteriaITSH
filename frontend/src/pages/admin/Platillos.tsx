@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { Pencil, Plus, Power, UtensilsCrossed } from 'lucide-react'
 import { Boton } from '../../components/ui/Boton'
 import { Campo } from '../../components/ui/Campo'
+import { EncabezadoPagina } from '../../components/ui/EncabezadoPagina'
 import { EstadoVacio } from '../../components/ui/EstadoVacio'
 import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
@@ -118,7 +120,11 @@ export function Platillos() {
 
   return (
     <section className="flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-bold text-on-surface">Platillos</h1>
+      <EncabezadoPagina
+        icono={UtensilsCrossed}
+        titulo="Platillos"
+        descripcion="Catálogo de la cafetería: crea, edita y activa platillos"
+      />
 
       {error && (
         <p role="alert" className="rounded-lg bg-error-container px-3 py-2 text-sm text-on-error-container">
@@ -128,7 +134,10 @@ export function Platillos() {
 
       <Tarjeta className="p-4">
         <form onSubmit={crear} className="grid gap-3 sm:grid-cols-2">
-          <h2 className="font-heading text-lg font-bold text-on-surface sm:col-span-2">Nuevo platillo</h2>
+          <h2 className="flex items-center gap-2 font-heading text-lg font-bold text-on-surface sm:col-span-2">
+            <Plus aria-hidden="true" className="size-5 text-primary" />
+            Nuevo platillo
+          </h2>
           <Campo etiqueta="Nombre" type="text" required maxLength={100} value={nombre} onChange={(e) => setNombre(e.target.value)} />
           <label className="flex flex-col gap-1 text-sm font-medium text-on-surface-variant">
             <span>Categoría</span>
@@ -149,6 +158,7 @@ export function Platillos() {
           </div>
           <div className="sm:col-span-2">
             <Boton type="submit" disabled={creando}>
+              <Plus aria-hidden="true" className="size-4" strokeWidth={2.4} />
               {creando ? 'Creando…' : 'Crear platillo'}
             </Boton>
           </div>
@@ -230,12 +240,14 @@ export function Platillos() {
                   <td className="px-4 py-4">
                     <div className="flex flex-wrap gap-2">
                       <Boton variante="secundario" onClick={() => prepararEdicion(platillo)}>
+                        <Pencil aria-hidden="true" className="size-4" />
                         Editar
                       </Boton>
                       <Boton
                         variante="secundario"
                         onClick={() => void cambiarEstado(platillo)}
                       >
+                        <Power aria-hidden="true" className="size-4" />
                         {platillo.activo ? 'Desactivar' : 'Activar'}
                       </Boton>
                     </div>

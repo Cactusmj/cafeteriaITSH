@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ArrowRight, BadgeCheck, Minus, PackageCheck, Plus, ReceiptText, ShoppingBasket, Wallet } from 'lucide-react'
 import { BadgeEstado } from '../../components/pedidos/BadgeEstado'
 import { Boton } from '../../components/ui/Boton'
 import { Campo } from '../../components/ui/Campo'
+import { EncabezadoPagina } from '../../components/ui/EncabezadoPagina'
 import { EstadoVacio } from '../../components/ui/EstadoVacio'
 import { Tarjeta } from '../../components/ui/Tarjeta'
 import { api, ErrorPeticion } from '../../lib/api'
@@ -158,21 +160,37 @@ export function Caja() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="font-heading text-2xl font-bold text-on-surface">Caja</h1>
+      <EncabezadoPagina
+        icono={ReceiptText}
+        titulo="Caja"
+        descripcion="Registra pedidos de mostrador y cobra en un solo paso"
+      />
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Tarjeta className="p-4">
-          <p className="font-heading text-base font-bold text-on-surface">Capturar pedido</p>
+        <Tarjeta className="group p-4">
+          <p className="flex items-center gap-2 font-heading text-base font-bold text-on-surface">
+            <span aria-hidden="true" className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl bg-primary-container text-on-primary-container">
+              <ShoppingBasket className="size-5" strokeWidth={2.2} />
+            </span>
+            Capturar pedido
+          </p>
           <p className="mt-1 text-sm text-on-surface-variant">Catálogo del menú de hoy con cantidades.</p>
-          <a href="#catalogo" className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-primary underline">
+          <a href="#catalogo" className="mt-3 inline-flex min-h-11 items-center gap-1 text-sm font-medium text-primary underline">
             Ir al catálogo
+            <ArrowRight aria-hidden="true" className="size-4" />
           </a>
         </Tarjeta>
-        <Tarjeta className="p-4">
-          <p className="font-heading text-base font-bold text-on-surface">Entregas</p>
+        <Tarjeta className="group p-4">
+          <p className="flex items-center gap-2 font-heading text-base font-bold text-on-surface">
+            <span aria-hidden="true" className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl bg-secondary-container text-on-secondary-container">
+              <PackageCheck className="size-5" strokeWidth={2.2} />
+            </span>
+            Entregas
+          </p>
           <p className="mt-1 text-sm text-on-surface-variant">Pedidos listos por entregar.</p>
-          <Link to="/caja/entregas" className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-primary underline">
+          <Link to="/caja/entregas" className="mt-3 inline-flex min-h-11 items-center gap-1 text-sm font-medium text-primary underline">
             Ver entregas
+            <ArrowRight aria-hidden="true" className="size-4" />
           </Link>
         </Tarjeta>
       </div>
@@ -187,8 +205,11 @@ export function Caja() {
       )}
 
       {cobro ? (
-        <Tarjeta className="p-4">
-          <p className="text-sm text-on-surface-variant">Cobro confirmado: folio {cobro.numero}</p>
+        <Tarjeta className="border-primary/30 p-4 ring-1 ring-primary/20">
+          <p className="flex items-center gap-2 text-sm font-semibold text-primary">
+            <BadgeCheck aria-hidden="true" className="size-5" />
+            Cobro confirmado: folio {cobro.numero}
+          </p>
           <p className="mt-1 font-mono text-xl font-bold text-on-surface">{cobro.numero}</p>
           <div className="mt-2">
             <BadgeEstado estado={cobro.estado} />
@@ -208,13 +229,17 @@ export function Caja() {
             </div>
           </dl>
           <Boton onClick={reiniciarVenta} className="mt-4">
+            <Plus aria-hidden="true" className="size-4" strokeWidth={2.4} />
             Nuevo pedido
           </Boton>
         </Tarjeta>
       ) : (
         <>
           <div id="catalogo" className="flex flex-col gap-3">
-            <h2 className="font-heading text-lg font-bold text-on-surface">Nuevo pedido</h2>
+            <h2 className="flex items-center gap-2 font-heading text-lg font-bold text-on-surface">
+              <ShoppingBasket aria-hidden="true" className="size-5 text-primary" />
+              Nuevo pedido
+            </h2>
             <Campo
               etiqueta="Buscar producto"
               placeholder="Buscar producto…"
@@ -246,7 +271,7 @@ export function Caja() {
                         aria-label={`Quitar una porción de ${platillo.platillo}`}
                         className={clasePaso}
                       >
-                        −
+                        <Minus aria-hidden="true" className="size-4" strokeWidth={2.4} />
                       </button>
                       <span className="min-w-6 text-center font-heading text-base font-bold text-on-surface">
                         {seleccion[platillo.id] ?? 0}
@@ -257,7 +282,7 @@ export function Caja() {
                         aria-label={`Agregar ${platillo.platillo}`}
                         className={clasePaso}
                       >
-                        +
+                        <Plus aria-hidden="true" className="size-4" strokeWidth={2.4} />
                       </button>
                     </div>
                   </li>
@@ -267,7 +292,10 @@ export function Caja() {
           </div>
 
           <Tarjeta className="p-4">
-            <h2 className="font-heading text-lg font-bold text-on-surface">Cobro</h2>
+            <h2 className="flex items-center gap-2 font-heading text-lg font-bold text-on-surface">
+              <Wallet aria-hidden="true" className="size-5 text-primary" />
+              Cobro
+            </h2>
             <p className="mt-1 text-xs text-on-surface-variant">
               El pedido se registra y cobra en un solo paso.
             </p>
@@ -292,6 +320,7 @@ export function Caja() {
                 Total: ${total.toFixed(2)}
               </p>
               <Boton onClick={() => void cobrar()} disabled={cobrando} className="min-h-12 w-full text-base">
+                <Wallet aria-hidden="true" className="size-5" />
                 {cobrando ? 'Cobrando…' : pedido ? 'Reintentar cobro' : 'Registrar y cobrar'}
               </Boton>
             </div>
